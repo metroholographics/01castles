@@ -5,7 +5,7 @@
 
 const int WINDOW_WIDTH  = 800;
 const int WINDOW_HEIGHT = 600; 
-
+const int FPS           = 30;
 
 typedef struct {
     SDL_Window *window;

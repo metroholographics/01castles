@@ -11,8 +11,8 @@
 
 v0.1
 - [x] Initialise SDL Environment
-- [ ] Window, Renderer
-- [ ] Loop, FPS
+- [x] Window, Renderer
+- [x] Loop, FPS
 - [ ] Game data
     - [ ] Board
     - [ ] Pieces
