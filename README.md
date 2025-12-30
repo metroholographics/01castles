@@ -1,6 +1,6 @@
 # 01castles
 
-- Editable chess board with PGN movetext parser to initialise board\
+- Editable chess board with PGN movetext parser to initialise board
 - Playable game (no ai) with move history
 
 ---
@@ -10,12 +10,12 @@
 ~~~~~~~~
 
 v0.1
-- [x] Initialise SDL Environment
+- [x] Initialise SDL environment
 - [x] Window, Renderer
 - [x] Loop, FPS
-- [ ] Game data
-    - [ ] Board
-    - [ ] Pieces
+- [x] Game data
+    - [x] Board
+    - [x] Pieces
 - [ ] Render default game state
 - [ ] Move history
 - [ ] Parse PGN movetext
