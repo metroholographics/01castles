@@ -2,7 +2,7 @@ CC = gcc
 C_FLAGS = -Wall -Wextra -Wpedantic -std=c99
 C_FILES = *.c
 EXE = main
-LINK_FLAGS = -lSDL3
+LINK_FLAGS = -lSDL3 -lSDL3_image
 
 
 all:

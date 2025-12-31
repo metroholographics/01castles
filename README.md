@@ -16,7 +16,10 @@ v0.1
 - [x] Game data
     - [x] Board
     - [x] Pieces
-- [ ] Render default game state
+- [~] Render default game state
+    - [~] Grid
+    - [~] Piece sprites
+- [ ] Engine clean-up
 - [ ] Move history
 - [ ] Parse PGN movetext
 - [ ] Step through move history
