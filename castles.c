@@ -1,15 +1,17 @@
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
 #include "castles.h"
 
+#define DEBUG 1
+
 const char *TITLE       = "01castles";
 const char *SPRITESHEET = "assets/spritesheet.png";
 
-Context context = {0};
-Piece board[8*8];
-SDL_FRect piece_sprite_array[NUM_PIECES];
+Context   context                        = {0};
+Piece     board[8*8]                     = {0};
+SDL_FRect piece_sprite_array[NUM_PIECES] = {0};
 
 void
 initialise_default_board(Piece *p)
@@ -44,8 +46,6 @@ main(int argc, char *argv[])
         destroy_context(&context);
         return -1;
     }
-
-    initialise_default_board(board);
     context.board_texture = SDL_CreateTexture(context.renderer, SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET, BOARD_SIZE, BOARD_SIZE
     );
@@ -58,9 +58,11 @@ main(int argc, char *argv[])
             context.board_texture->w, context.board_texture->h
         );
     }
+
+    initialise_default_board(board);
     populate_piece_sprite_array(piece_sprite_array);
 
-    {
+    if (DEBUG) {
         printf("Grid:%d\n", ARRAY_SIZE(board));
         for (int f = 0; f < 8; f++) {
             for (int r = 0; r < 8; r++) {
@@ -73,6 +75,7 @@ main(int argc, char *argv[])
     bool running = true;
     SDL_Event e;
     while (running) {
+        SDL_Color r_c;
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
                 case SDL_EVENT_QUIT:
@@ -82,33 +85,34 @@ main(int argc, char *argv[])
                     break;
             }
         }
-
+        // Draw to board texture
         SDL_SetRenderTarget(context.renderer, context.board_texture);
-        SDL_Color c = CLEAR_COLOR;
-        SDL_SetRenderDrawColor(context.renderer, c.r, c.g, c.b, c.a);
+        r_c = CLEAR_COLOR;
+        SDL_SetRenderDrawColor(context.renderer, r_c.r, r_c.g, r_c.b, r_c.a);
         SDL_RenderClear(context.renderer);
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece p = board[row * 8 + col];
-                SDL_Color c = (
-                    (row + col) % 2 == 0 ? DARK_SQUARE : LIGHT_SQUARE
-                );
                 SDL_FRect d = (SDL_FRect){col*BOARD_TILE, row*BOARD_TILE, BOARD_TILE, BOARD_TILE};
-                SDL_SetRenderDrawColor(context.renderer, c.r, c.g, c.b, c.a);
+                SDL_Color sq_c = (((row + col) % 2 == 0 ) ? DARK_SQUARE : LIGHT_SQUARE);
+                // Render board square
+                SDL_SetRenderDrawColor(context.renderer, sq_c.r, sq_c.g, sq_c.b, sq_c.a);
                 SDL_RenderFillRect(context.renderer, &d);
-                SDL_RenderTexture(context.renderer, context.spritesheet,
+                // Render piece on board square
+                SDL_RenderTexture(
+                    context.renderer, context.spritesheet,
                     get_piece_sprite_source(p, piece_sprite_array),
                     &d
                 );
             }
         }
-
+        // Draw to window
         SDL_SetRenderTarget(context.renderer, NULL);
-        c = CLEAR_COLOR;
-        SDL_SetRenderDrawColor(context.renderer, c.r, c.g, c.b, c.a);
+        r_c = CLEAR_COLOR;
+        SDL_SetRenderDrawColor(context.renderer, r_c.r, r_c.g, r_c.b, r_c.a);
         SDL_RenderClear(context.renderer);
-        SDL_FRect bt = (SDL_FRect) {320, 20, BOARD_SIZE, BOARD_SIZE};
-        SDL_RenderTexture(context.renderer, context.board_texture, NULL, &bt);
+        SDL_FRect board_tex = (SDL_FRect){320, 20, BOARD_SIZE, BOARD_SIZE};
+        SDL_RenderTexture(context.renderer, context.board_texture, NULL, &board_tex);
 
         SDL_RenderPresent(context.renderer);
 
@@ -131,7 +135,7 @@ initialise_context(Context *c, const char *title, int width, int height, const c
         printf("!!Error: could not initialise SDL - %s\n", SDL_GetError());
         return false;
     } else {
-        printf("~~SDL Initialised\n");
+        printf("~~SDL initialised\n");
     }
 
     c->window = SDL_CreateWindow(title, width, height, 0);
@@ -155,7 +159,7 @@ initialise_context(Context *c, const char *title, int width, int height, const c
         printf("!!Error: could not create spritesheet - %s\n", SDL_GetError());
         return false;
     } else {
-        printf("~~loaded and created spritesheet texture\n");
+        printf("~~loaded and created spritesheet texture: %s\n", spritesheet);
     }
 
     return true;

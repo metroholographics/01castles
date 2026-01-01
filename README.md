@@ -16,12 +16,13 @@ v0.1
 - [x] Game data
     - [x] Board
     - [x] Pieces
-- [~] Render default game state
-    - [~] Grid
-    - [~] Piece sprites
-- [ ] Engine clean-up
-- [ ] Move history
-- [ ] Parse PGN movetext
+- [x] Render default game state
+    - [x] Grid
+    - [x] Piece sprites
+- [!] Parse PGN movetext
+    - [~] Strip tag pairs
+    - [ ] Populate turn buffer
 - [ ] Step through move history
+- [ ] On-screen text box to paste pgn data
 
 ~~~~~~~~

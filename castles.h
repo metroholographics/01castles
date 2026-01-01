@@ -33,12 +33,12 @@ typedef enum {
     A, B, C, D, E, F, G, H
 } RANK;
 
-bool initialise_context(Context *c, const char *title, int width, int height,
-    const char *spritesheet);
-void destroy_context(Context *c);
-void initialise_default_board(Piece *p);
+bool       initialise_context(Context *c, const char *title, int width, int height, 
+                              const char *spritesheet);
+void       destroy_context(Context *c);
+void       initialise_default_board(Piece *p);
 SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
-void populate_piece_sprite_array(SDL_FRect *sprite_array);
+void       populate_piece_sprite_array(SDL_FRect *sprite_array);
 
 
 #endif

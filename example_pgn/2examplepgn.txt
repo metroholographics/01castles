@@ -1,0 +1,25 @@
+[Event "Varsity Oxford-Cambridge"]
+[Site "Cambridge, St Johns College"]
+[Date "1940.03.16"]
+[Round "3"]
+[White "Dunkle, John Hull"]
+[Black "Charlesworth, Kenneth Preston"]
+[Result "1-0"]
+[ECO "A85"]
+[PlyCount "61"]
+[EventDate "1940.03.16"]
+[EventType "team"]
+[EventRounds "1"]
+[EventCountry "ENG"]
+[SourceTitle "BCM-1940-05"]
+[WhiteTeam "Oxford University"]
+[BlackTeam "Cambridge University"]
+[WhiteTeamCountry "ENG"]
+[BlackTeamCountry "ENG"]
+
+1. d4 f5 2. c4 e6 3. Nc3 Nf6 4. g3 Bb4 5. Bg2 O-O 6. Nf3 Qe8 7. O-O Bxc3 8.
+bxc3 d6 9. Qc2 Nc6 10. Rb1 Rb8 11. Ba3 e5 12. dxe5 Nxe5 13. Nxe5 Qxe5 14. Rb5
+c5 15. Rd1 Ne4 16. Rd3 Be6 17. f4 Qf6 18. Bxe4 fxe4 19. Rxd6 Qf7 20. Rxc5 Bxc4
+21. Qxe4 Bxa2 22. Qd4 Be6 23. Re5 Rfe8 24. e4 Bh3 25. Rg5 h6 26. Rgg6 Rbc8 27.
+Rdf6 Qc7 28. Bd6 Qd7 29. Qd5+ Kh7 30. Rxh6+ gxh6 31. Rf7+ {Source: The Times,
+26 Mar 1940 and BCM, May 1940, p161. Not an official Varsity match.} 1-0
