@@ -10,7 +10,7 @@
 [TimeControl "5400+30"]
 [Link "https://www.chess.com/events/2023-alireza-firouzjas-race-to-candidates/05/Fedorchuk_Sergey_A_-Firouzja_Alireza"]
 
-1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. h3 e5 7. Nde2 h5 8. g3
+1. e4 {comment} 1...c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. h3 e5 7. Nde2 h5 8. g3
 Be7 9. Be3 b5 10. Nd5 Nbd7 11. Nec3 Bb7 12. Bg2 Rc8 13. a4 Nxd5 14. Nxd5 Bxd5
 15. Qxd5 b4 16. O-O a5 17. c3 bxc3 18. bxc3 h4 19. c4 O-O 20. Rfb1 Bg5 21. Bxg5
 Qxg5 22. Qxd6 Nc5 23. gxh4 Qf4 24. Rb5 Rfd8 25. Qe7 Ne6 26. Rd5 Re8 27. Qa3 Rxc4

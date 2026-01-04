@@ -7,9 +7,11 @@
 
 #define MAX_TURNS 300
 
-
+#define PGN_WHITE 0
+#define PGN_BLACK 1
 
 typedef enum {
+    PGN_ERR_ENDGAME   = -5,
     PGN_ERR_PARSE_MTX = -4,
     PGN_ERR_STRIP_TAG = -3,
     PGN_ERR_TAG_BRACE = -2,
@@ -19,8 +21,11 @@ typedef enum {
 
 
 typedef struct {
-    char *piece[2][3];
-    char *move_to[2][3];
+    char piece[4][4];
+    char move_to[4][3];
+    bool castle[2];
+    bool white_move;
+    bool black_move;
 } PGN_Turn;
 
 typedef struct {
@@ -32,7 +37,12 @@ const char* pgn_get_error(PGN_Error e);
 PGN_Error pgn_create_game(PGN_Game *g, const char *filepath);
 PGN_Error strip_tag_pairs(FILE *f);
 PGN_Error parse_movetext(PGN_Game *g, FILE *f);
-
-
+PGN_Error pgn_read_turn(PGN_Turn *t, FILE *f);
+bool file_check_nextc(FILE *f, char c);
+int pgn_read_move(char* buff, int buff_max, FILE *f);
+void pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index);
+bool pgn_is_piece(char c);
+bool pgn_is_rank(char c);
+bool pgn_piece_or_rank(char c);
 
 #endif

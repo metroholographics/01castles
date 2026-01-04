@@ -1,5 +1,5 @@
 CC = gcc
-C_FLAGS = -Wall -Wextra -Wpedantic -std=c99
+C_FLAGS = -Wall -Wextra -Wpedantic -std=c99 -g
 C_FILES = castles.c
 EXE = main
 LINK_FLAGS = -lSDL3 -lSDL3_image

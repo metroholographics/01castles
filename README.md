@@ -21,7 +21,11 @@ v0.1
     - [x] Piece sprites
 - [!] Parse PGN movetext
     - [~] Strip tag pairs
+    - [~] Read turn
     - [ ] Populate turn buffer
+        - [~] Castle
+        - [ ] Promotion
+    - [ ] Cleanup + testing
 - [ ] Step through move history
 - [ ] On-screen text box to paste pgn data
 
