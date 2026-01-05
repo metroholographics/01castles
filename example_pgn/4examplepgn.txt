@@ -1,0 +1,21 @@
+[Event "PGN Feature Demonstration"]
+[Site "ChatGPT"]
+[Date "2026.01.05"]
+[Round "1"]
+[White "ExampleWhite"]
+[Black "ExampleBlack"]
+[Result "1-0"]
+
+1. e4 {White stakes a claim in the center.} e5 2. Nf3 Nc6 3. Bb5 a6 $1 {A useful waiting move.}
+4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O
+9. h3 {Prevents Bg4.} Nb8?! $4 10. d4 Nbd7
+11. c4 ; This is a semicolon-style comment explaining the pawn break
+11... c6 12. Nc3 Qc7 13. Be3 Bb7 14. Rc1 b4 15. Nd1 exd4
+16. Nxd4 Nxe4 17. Nf5 Bf6 18. Bd4 c5 (18... Bxd4 19. Qxd4)
+19. Bxf6 Ndxf6 20. f3 cxd4 21. fxe4 Nxe4 22. Qxd4 Nf6
+23. Qxb4 Rab8 24. Qa4 Nxe4 25. Rxe4 Bxe4 26. Qxe4 d5
+27. Qe3 Bc5 28. Nd4 Re8 29. Qf2 Qb6 30. Rd1 Re4
+31. Qxf7+ Kxf7 32. axb5 axb5 33. Nxb5 Qxb5 34. Nd6+ Bxd6
+35. exd6 Qxb2 36. d7 Red8 37. dxc8=Q+ Rxc8
+38. dxc8=Q+ {Promotion with check.} Rxc8
+39. axb8=Q# {Pawn promotion with capture and checkmate — a very long SAN move.}

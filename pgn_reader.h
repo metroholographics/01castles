@@ -11,6 +11,7 @@
 #define PGN_BLACK 1
 
 typedef enum {
+    PGN_ERR_SCANLINE  = -6,
     PGN_ERR_ENDGAME   = -5,
     PGN_ERR_PARSE_MTX = -4,
     PGN_ERR_STRIP_TAG = -3,
@@ -23,7 +24,9 @@ typedef enum {
 typedef struct {
     char piece[4][4];
     char move_to[4][3];
+    char promotion_piece[2][2];
     bool castle[2];
+    bool promotion[2];
     bool white_move;
     bool black_move;
 } PGN_Turn;

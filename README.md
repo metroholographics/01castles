@@ -20,13 +20,12 @@ v0.1
     - [x] Grid
     - [x] Piece sprites
 - [!] Parse PGN movetext
-    - [~] Strip tag pairs
-    - [~] Read turn
-    - [ ] Populate turn buffer
-        - [~] Castle
-        - [ ] Promotion
-    - [ ] Cleanup + testing
-- [ ] Step through move history
+    - [x] Strip tag pairs
+    - [x] Read turn
+    - [~] Populate turn buffer
+        - [x] Castle
+        - [~] Promotion
+- [ ] Step through move history on board
 - [ ] On-screen text box to paste pgn data
 
 ~~~~~~~~
