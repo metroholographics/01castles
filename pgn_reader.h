@@ -1,14 +1,14 @@
 #ifndef PGN_READER_H
 #define PGN_READER_H
 
-#include "castles.h"
 
 #define PGN_LOG_ERROR(e) (printf("!!PGN_Error: %s\n", pgn_get_error((e))))
 
-#define MAX_TURNS 300
+#define PGN_MAX_TURNS 300
 
 #define PGN_WHITE 0
 #define PGN_BLACK 1
+#define PGN_ROOK_OFFSET 2
 
 typedef enum {
     PGN_ERR_SCANLINE  = -6,
@@ -19,7 +19,6 @@ typedef enum {
     PGN_ERR_FILE_OPEN = -1,
     PGN_SUCCESS = 0,
 } PGN_Error;
-
 
 typedef struct {
     char piece[4][4];
@@ -33,7 +32,7 @@ typedef struct {
 
 typedef struct {
     int      num_turns;
-    PGN_Turn move_buffer[MAX_TURNS];
+    PGN_Turn move_buffer[PGN_MAX_TURNS];
 } PGN_Game;
 
 const char* pgn_get_error(PGN_Error e);
@@ -47,5 +46,6 @@ void pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
 bool pgn_is_piece(char c);
 bool pgn_is_rank(char c);
 bool pgn_piece_or_rank(char c);
+
 
 #endif

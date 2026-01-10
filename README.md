@@ -19,13 +19,17 @@ v0.1
 - [x] Render default game state
     - [x] Grid
     - [x] Piece sprites
-- [!] Parse PGN movetext
+- [x] Parse PGN movetext
     - [x] Strip tag pairs
     - [x] Read turn
-    - [~] Populate turn buffer
+    - [x] Populate turn buffer
         - [x] Castle
-        - [~] Promotion
-- [ ] Step through move history on board
+        - [x] Promotion
+- [!] Step through move history on board
+    - [~] cache each turn and step through boards
+    - [ ] pawn moves
+        - [~] normal
+        - [ ] capture
 - [ ] On-screen text box to paste pgn data
 
 ~~~~~~~~

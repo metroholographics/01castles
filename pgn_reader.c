@@ -1,20 +1,13 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "pgn_reader.h"
 
-int
-main(void)
-{
-    PGN_Game g = {0};
-    if (pgn_create_game(&g, "example_pgn/3examplepgn.txt") < 0) {
-        printf("quitting\n");
-        return -1;
-    }
-
-    printf("\nCongrats - PGN parsed\n");
-    return 0;
-}
-
+/*Usage:
+'if (pgn_create_game(&PGN_GAME_STRUCT, PGN_GAME_FILEPATH) < 0)'
+-returns negative number if error parsing the pgn, else PGN_GAME_STRUCT
+is populated
+*/
 PGN_Error
 pgn_create_game(PGN_Game *g, const char *filepath)
 {
@@ -52,18 +45,17 @@ parse_movetext(PGN_Game *g, FILE *f)
     fgetpos(f, &start);
     
     //REMOVE AFTER TESTING
-    {   
-        char c = '\0';
-        while ((c = getc(f)) != EOF)
-        printf("%c", c);
-        printf("\n\n");
-        fsetpos(f, &start);
-    }
+    // {   
+    //     char c = '\0';
+    //     while ((c = getc(f)) != EOF)
+    //     printf("%c", c);
+    //     printf("\n\n");
+    //     fsetpos(f, &start);
+    // }
     
     g->num_turns = -1;
     for (;;) {
         int i = ++g->num_turns;
-        printf("Reading turn %d\n", i+1);
         if (pgn_read_turn(&g->move_buffer[i], f) < 0) {
             printf("\nGame ended\n");
             if (!g->move_buffer[i].white_move && !g->move_buffer[i].black_move)
@@ -101,23 +93,23 @@ pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
         t->castle[color_index]       = true;
         t->piece[color_index][0]     = 'K';
         t->piece[color_index][1]     = '\0';
-        t->piece[color_index + 2][0] = 'R';
-        t->piece[color_index + 2][1] = '\0';
+        t->piece[color_index + PGN_ROOK_OFFSET][0] = 'R';
+        t->piece[color_index + PGN_ROOK_OFFSET][1] = '\0';
         //filling rank for kingside(len3 "O-O") vs queenside(len5 - "O-O-O") castle
         if (len == 3) {
             t->move_to[color_index][0]     = 'g';
             t->move_to[color_index][2]     = '\0';
-            t->move_to[color_index + 2][0] = 'f';
-            t->move_to[color_index + 2][2] = '\0';
+            t->move_to[color_index + PGN_ROOK_OFFSET][0] = 'f';
+            t->move_to[color_index + PGN_ROOK_OFFSET][2] = '\0';
         } else if (len == 5) {
             t->move_to[color_index][0]     = 'c';
             t->move_to[color_index][2]     = '\0';
-            t->move_to[color_index + 2][0] = 'd';
-            t->move_to[color_index + 2][2] = '\0';
+            t->move_to[color_index + PGN_ROOK_OFFSET][0] = 'd';
+            t->move_to[color_index + PGN_ROOK_OFFSET][2] = '\0';
         }
         //filling file for white vs black castle e.g. [K] to [g][1/8]
-        t->move_to[color_index][1]     = (color_index == PGN_WHITE) ? '1' : '8';
-        t->move_to[color_index + 2][1] = (color_index == PGN_WHITE) ? '1' : '8';
+        t->move_to[color_index][1]                   = (color_index == PGN_WHITE) ? '1' : '8';
+        t->move_to[color_index + PGN_ROOK_OFFSET][1] = (color_index == PGN_WHITE) ? '1' : '8';
     } else if (promotion_check == '=') {
         //promotion
         t->promotion[color_index] = true;
@@ -170,7 +162,8 @@ pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
 
     printf("\n---Piece %s moves to %s\n", t->piece[color_index], t->move_to[color_index]);
     if (t->castle[color_index]) {
-        printf("\t %s moves to %s\n", t->piece[color_index+2], t->move_to[color_index+2]);
+        printf("\t %s moves to %s\n", t->piece[color_index+PGN_ROOK_OFFSET],
+            t->move_to[color_index+PGN_ROOK_OFFSET]);
     }
     if (t->promotion[color_index]) {
         printf("\t %s promotes to %s\n", t->piece[color_index], t->promotion_piece[color_index]);
@@ -222,10 +215,10 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
             t->white_move = true;
         }
     }
-    for (int i = 0; i < white_len; i++) {
-        char j = white_move_buffer[i];
-        printf("%c", j);
-    }
+    // for (int i = 0; i < white_len; i++) {
+    //     char j = white_move_buffer[i];
+    //     printf("%c", j);
+    // }
 
     if (c == ' ') {
         while((c = getc(f)) == ' ');
@@ -257,12 +250,12 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         //ungetc(c,f);
     }
 
-    for (int i = 0; i < black_len; i++) {
-        char j = black_move_buffer[i];
-        printf("%c", j);
-    }
+    // for (int i = 0; i < black_len; i++) {
+    //     char j = black_move_buffer[i];
+    //     printf("%c", j);
+    // }
 
-    printf("\n");
+    // printf("\n");
     return PGN_SUCCESS;
 }
 

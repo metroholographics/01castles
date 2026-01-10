@@ -2,8 +2,10 @@
 #define CASTLES_H
 
 #include <SDL3/SDL.h>
+#include "pgn_reader.h"
 
-#define ARRAY_SIZE(a) ((int)((sizeof((a))) / (sizeof((a)[0]))))
+#define ARRAY_SIZE(a)      ((int)((sizeof((a))) / (sizeof((a)[0]))))
+#define CLAMP_I(x,min,max) ((int)(((x) < (min)) ? (min) : ((x) > (max)) ? (max) : (x)))
 
 #define CLEAR_COLOR  (SDL_Color) {145, 163, 170, 255}
 #define LIGHT_SQUARE (SDL_Color) {145, 163, 170, 255}
@@ -14,13 +16,6 @@ const int WINDOW_HEIGHT = 600;
 const int BOARD_SIZE    = 560;
 const int BOARD_TILE    = 70;
 const int FPS           = 30;
-
-typedef struct {
-    SDL_Window   *window;
-    SDL_Renderer *renderer;
-    SDL_Texture  *spritesheet;
-    SDL_Texture  *board_texture;
-} Context;
 
 typedef enum {
     EMPTY=0,
@@ -33,12 +28,29 @@ typedef enum {
     A, B, C, D, E, F, G, H
 } RANK;
 
-bool       initialise_context(Context *c, const char *title, int width, int height, 
-                              const char *spritesheet);
-void       destroy_context(Context *c);
-void       initialise_default_board(Piece *p);
-SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
-void       populate_piece_sprite_array(SDL_FRect *sprite_array);
+typedef struct {
+    Piece game_turns[PGN_MAX_TURNS*2][8*8];
+    int num_turns;
+} TurnHistory;
 
+typedef struct {
+    SDL_Window   *window;
+    SDL_Renderer *renderer;
+    SDL_Texture  *spritesheet;
+    SDL_Texture  *board_texture;
+} Context;
+
+
+bool initialise_context(Context *c, const char *title, int width, int height, 
+    const char *spritesheet);
+void destroy_context(Context *c);
+void initialise_default_board(Piece *p);
+SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
+void populate_piece_sprite_array(SDL_FRect *sprite_array);
+void store_game_in_boards(TurnHistory *th, PGN_Game p);
+void copy_board(Piece *target, Piece *source);
+void input_turn_on_board(Piece* b, PGN_Turn t, int color);
+void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
+int get_index_from_move(char file, char rank);
 
 #endif

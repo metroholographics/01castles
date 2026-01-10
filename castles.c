@@ -6,12 +6,16 @@
 
 #define DEBUG 1
 
-const char *TITLE       = "01castles";
-const char *SPRITESHEET = "assets/spritesheet.png";
+const char *TITLE        = "01castles";
+const char *SPRITESHEET  = "assets/spritesheet.png";
+const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
 
-Context   context                        = {0};
-Piece     board[8*8]                     = {0};
-SDL_FRect piece_sprite_array[NUM_PIECES] = {0};
+Context     context                        = {0};
+SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
+PGN_Game    pgn_game                       = {0};
+TurnHistory turn_history                   = {0};
+Piece       *current_board                 = NULL;
+int         current_board_index            = 0;
 
 void
 initialise_default_board(Piece *p)
@@ -59,31 +63,59 @@ main(int argc, char *argv[])
         );
     }
 
-    initialise_default_board(board);
     populate_piece_sprite_array(piece_sprite_array);
 
+    if (pgn_create_game(&pgn_game, PGN_FILEPATH) < 0) {
+        printf("!!Error: could not parse provided PGN\n");
+        destroy_context(&context);
+        return -1;
+    } else {
+        printf("...Congrats, PGN parsed\n");
+    }
+
+    store_game_in_boards(&turn_history, pgn_game);
+    current_board = turn_history.game_turns[current_board_index];
     if (DEBUG) {
-        printf("Grid:%d\n", ARRAY_SIZE(board));
+        printf("Grid:%d\n", ARRAY_SIZE(turn_history.game_turns[current_board_index]));
         for (int f = 0; f < 8; f++) {
             for (int r = 0; r < 8; r++) {
-                printf(".%d.", board[f*8+r]);
+                printf(".%d.", current_board[f*8+r]);
             }
             printf("\n");
         }
     }
 
+
     bool running = true;
     SDL_Event e;
     while (running) {
+        bool trigger_board_refresh = false;
         SDL_Color r_c;
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
                 case SDL_EVENT_QUIT:
                     running = false;
                     break;
+                case SDL_EVENT_KEY_DOWN:
+                    if (e.key.key == SDLK_RIGHT) {
+                        trigger_board_refresh = true;
+                        current_board_index++;
+                    } else if (e.key.key == SDLK_LEFT) {
+                        trigger_board_refresh = true;
+                        current_board_index--;
+                    } else if (e.key.key == SDLK_R) {
+                        trigger_board_refresh = true;
+                        current_board_index = 0;
+                    }
                 default:
                     break;
             }
+        }
+
+        if (trigger_board_refresh) {
+            current_board_index = CLAMP_I(current_board_index, 0, turn_history.num_turns);
+            current_board = turn_history.game_turns[current_board_index];
+            printf("%d ", current_board_index);
         }
         // Draw to board texture
         SDL_SetRenderTarget(context.renderer, context.board_texture);
@@ -92,7 +124,7 @@ main(int argc, char *argv[])
         SDL_RenderClear(context.renderer);
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                Piece p = board[row * 8 + col];
+                Piece p = current_board[row * 8 + col];
                 SDL_FRect d = (SDL_FRect){col*BOARD_TILE, row*BOARD_TILE, BOARD_TILE, BOARD_TILE};
                 SDL_Color sq_c = (((row + col) % 2 == 0 ) ? DARK_SQUARE : LIGHT_SQUARE);
                 // Render board square
@@ -121,6 +153,111 @@ main(int argc, char *argv[])
 
     destroy_context(&context);
     return 0;
+}
+
+void
+store_game_in_boards(TurnHistory *th, PGN_Game p)
+{
+    th->num_turns = p.num_turns;
+    initialise_default_board(th->game_turns[0]);
+
+    int board_index = 1;
+    for (int i = 0; i < th->num_turns; i++) {
+        PGN_Turn current_turn = p.move_buffer[i];
+        copy_board(th->game_turns[board_index], th->game_turns[board_index-1]);
+        if (current_turn.white_move){
+            input_turn_on_board(th->game_turns[board_index], current_turn, PGN_WHITE);
+        }
+        board_index++;
+        copy_board(th->game_turns[board_index], th->game_turns[board_index-1]);
+        if (current_turn.black_move){
+            input_turn_on_board(th->game_turns[board_index], current_turn, PGN_BLACK);
+        }
+        board_index++;
+        
+    }
+}
+
+void
+input_turn_on_board(Piece* b, PGN_Turn t, int color)
+{
+    bool castle = t.castle[color];
+    bool promotion = t.promotion[color];
+
+    //TODO: handle castle and promotion moves first if exist
+
+    char piece = '\0';
+    piece = t.piece[color][0];
+
+    switch (piece) {
+        case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color); 
+    }
+}
+
+void
+handle_pawn_move(Piece *b, char *piece, char *destination, int color)
+{
+
+    //Normal pawn move
+    if (piece[1] == '\0') {
+        int destination_index = get_index_from_move(destination[0], destination[1]);
+        if (destination_index < 0) {
+            printf("ERROR DESTINATION INDEX");
+            return;
+        }
+
+        int sign   = (color == PGN_WHITE) ? -1 : 1;
+        Piece pawn = (color == PGN_WHITE) ? W_PAWN : B_PAWN;
+
+        if (b[destination_index + sign] == pawn) {
+            b[destination_index] = pawn;
+            b[destination_index + sign] = EMPTY;
+        } else if (b[destination_index + (sign*2)] == pawn) {
+            b[destination_index] = pawn;
+            b[destination_index + (sign*2)] = EMPTY;
+        } else {
+            printf("ERROR: INVALID PAWN MOVE?\n");
+            return;
+        }
+    }
+
+}
+
+int
+get_index_from_move(char file, char rank) {
+    int f, r;
+    switch (file) {
+        case 'a': f = 0; break;
+        case 'b': f = 1; break;
+        case 'c': f = 2; break;
+        case 'd': f = 3; break;
+        case 'e': f = 4; break;
+        case 'f': f = 5; break;
+        case 'g': f = 6; break;
+        case 'h': f = 7; break;
+        default : return -1;
+    }
+    switch (rank) {
+        case '1': r = 0; break;
+        case '2': r = 1; break;
+        case '3': r = 2; break;
+        case '4': r = 3; break;
+        case '5': r = 4; break;
+        case '6': r = 5; break;
+        case '7': r = 6; break;
+        case '8': r = 7; break;
+        default : return -1;
+    }
+    return (f * 8) + r;
+}
+
+
+void
+copy_board(Piece *target, Piece *source)
+{
+    for (int i = 0; i < 8*8; i++) {
+        target[i] = source[i];
+    }
 }
 
 bool

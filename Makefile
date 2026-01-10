@@ -1,6 +1,6 @@
 CC = gcc
 C_FLAGS = -Wall -Wextra -Wpedantic -std=c99 -g
-C_FILES = castles.c
+C_FILES = castles.c pgn_reader.c
 EXE = main
 LINK_FLAGS = -lSDL3 -lSDL3_image
 
