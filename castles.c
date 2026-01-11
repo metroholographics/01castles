@@ -85,7 +85,6 @@ main(int argc, char *argv[])
         }
     }
 
-
     bool running = true;
     SDL_Event e;
     while (running) {
@@ -174,50 +173,62 @@ store_game_in_boards(TurnHistory *th, PGN_Game p)
             input_turn_on_board(th->game_turns[board_index], current_turn, PGN_BLACK);
         }
         board_index++;
-        
     }
 }
 
 void
 input_turn_on_board(Piece* b, PGN_Turn t, int color)
 {
-    bool castle = t.castle[color];
+    bool castle    = t.castle[color];
     bool promotion = t.promotion[color];
 
     //TODO: handle castle and promotion moves first if exist
 
     char piece = '\0';
-    piece = t.piece[color][0];
+    piece      = t.piece[color][0];
 
     switch (piece) {
-        case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color); 
+        case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color);
     }
 }
 
 void
 handle_pawn_move(Piece *b, char *piece, char *destination, int color)
 {
+    int sign   = (color == PGN_WHITE) ? -1 : 1;
+    Piece active_pawn = (color == PGN_WHITE) ? W_PAWN : B_PAWN;
+    int destination_index = get_index_from_move(destination[0], destination[1]);
 
     //Normal pawn move
     if (piece[1] == '\0') {
-        int destination_index = get_index_from_move(destination[0], destination[1]);
         if (destination_index < 0) {
             printf("ERROR DESTINATION INDEX");
             return;
         }
-
-        int sign   = (color == PGN_WHITE) ? -1 : 1;
-        Piece pawn = (color == PGN_WHITE) ? W_PAWN : B_PAWN;
-
-        if (b[destination_index + sign] == pawn) {
-            b[destination_index] = pawn;
+        if (b[destination_index + sign] == active_pawn) {
+            b[destination_index]        = active_pawn;
             b[destination_index + sign] = EMPTY;
-        } else if (b[destination_index + (sign*2)] == pawn) {
-            b[destination_index] = pawn;
+        } else if (b[destination_index + (sign*2)] == active_pawn) {
+            b[destination_index]            = active_pawn;
             b[destination_index + (sign*2)] = EMPTY;
         } else {
             printf("ERROR: INVALID PAWN MOVE?\n");
             return;
+        }
+    } else {
+        //capture
+        if (b[destination_index] != EMPTY) {
+            int found_index = get_index_from_move(piece[1], destination[1]);
+            found_index += sign;
+            if (b[found_index] == active_pawn) {
+                b[destination_index] = active_pawn;
+                b[found_index]       = EMPTY;
+            } else {
+                printf("ERROR: INVALID PAWN MOVE?\n");
+                return;
+            }
+        } else {
+            //en-passant
         }
     }
 
