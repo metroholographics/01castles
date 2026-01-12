@@ -26,10 +26,11 @@ v0.1
         - [x] Castle
         - [x] Promotion
 - [!] Step through move history on board
-    - [~] cache each turn and step through boards
-    - [ ] pawn moves
-        - [~] normal
-        - [ ] capture
+    - [x] cache each turn and step through boards
+    - [~] pawn moves
+        - [x] normal
+        - [~] capture and en passant
+    - [ ] knight moves 
 - [ ] On-screen text box to paste pgn data
 
 ~~~~~~~~
