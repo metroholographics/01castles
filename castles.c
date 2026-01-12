@@ -229,6 +229,11 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
             }
         } else {
             //en-passant
+            Piece passing_pawn = (active_pawn == W_PAWN) ? B_PAWN : W_PAWN;
+            if (b[destination_index - sign] == passing_pawn) {
+                b[destination_index]     = active_pawn;
+                b[destination_index - sign] = EMPTY;
+            }
         }
     }
 
