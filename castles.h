@@ -44,13 +44,21 @@ typedef struct {
 bool initialise_context(Context *c, const char *title, int width, int height, 
     const char *spritesheet);
 void destroy_context(Context *c);
-void initialise_default_board(Piece *p);
+
 SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
-void populate_piece_sprite_array(SDL_FRect *sprite_array);
+void       populate_piece_sprite_array(SDL_FRect *sprite_array);
+
+void initialise_default_board(Piece *p);
 void store_game_in_boards(TurnHistory *th, PGN_Game p);
 void copy_board(Piece *target, Piece *source);
 void input_turn_on_board(Piece* b, PGN_Turn t, int color);
-void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
+
+int char_to_file_or_rank(char c);
 int get_index_from_move(char file, char rank);
+
+void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
+void handle_knight_move(Piece *b, char *piece, char *destination, int color);
+int  hunt_knight(int destination_index, int file_index, int rank_index, Piece knight);
+
 
 #endif

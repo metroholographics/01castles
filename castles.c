@@ -189,8 +189,43 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
 
     switch (piece) {
         case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color);
+        case 'N': handle_knight_move(b, t.piece[color], t.move_to[color], color);
     }
 }
+void
+handle_knight_move(Piece *b, char *piece, char *destination, int color)
+{
+    Piece active_knight   = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT;
+    int destination_index = get_index_from_move(destination[0], destination[1]);
+
+    if (piece[2] != '\0') {
+        //we know the exact co-ords
+    } else if (piece[1] != '\0') {
+        //we know the rank
+    } else {
+        //we need to find the knight based on destination square
+        int file_index = char_to_file_or_rank(destination[0]);
+        int rank_index = char_to_file_or_rank(destination[1]);
+
+        int moving_knight = hunt_knight(destination_index, file_index, rank_index, active_knight);
+        if (moving_knight > 0) {
+            b[destination_index] = active_knight;
+            b[moving_knight]     = EMPTY;
+        } else {
+            printf("ERROR: INVALID KNIGHT MOVE? - knight hunt\n");
+            return;
+        }
+    }
+
+}
+
+int
+hunt_knight(int destination_index, int file_index, int rank_index, Piece knight)
+{
+
+    return -1;
+}
+
 
 void
 handle_pawn_move(Piece *b, char *piece, char *destination, int color)
@@ -242,6 +277,22 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
             }
         }
     }
+}
+
+int
+char_to_file_or_rank(char c)
+{
+    switch (c) {
+        case 'a': case '1': return 0;
+        case 'b': case '2': return 1;
+        case 'c': case '3': return 2;
+        case 'd': case '4': return 3;
+        case 'e': case '5': return 4;
+        case 'f': case '6': return 5;
+        case 'g': case '7': return 6;
+        case 'h': case '8': return 7;
+    }
+    return -1;
 }
 
 int
