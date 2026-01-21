@@ -27,10 +27,11 @@ v0.1
         - [x] Promotion
 - [!] Step through move history on board
     - [x] cache each turn and step through boards
-    - [~] pawn moves
+    - [x] pawn moves
         - [x] normal
-        - [~] capture and en passant
-    - [ ] knight moves 
+        - [x] capture and en passant
+    - [~] knight moves
+    - [ ] bishop moves
 - [ ] On-screen text box to paste pgn data
 
 ~~~~~~~~
