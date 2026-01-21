@@ -198,17 +198,31 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
 {
     Piece active_knight   = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT;
     int destination_index = get_index_from_move(destination[0], destination[1]);
-
+    
     if (piece[2] != '\0') {
-        //we know the exact co-ords
+        int file_index = char_to_file_or_rank(piece[1]);
+        int rank_index = char_to_file_or_rank(piece[2]);
+        b[destination_index]       = active_knight;
+        b[file_index*8+rank_index] = EMPTY;
     } else if (piece[1] != '\0') {
-        //we know the rank
+        int file_index = char_to_file_or_rank(piece[1]);
+        int i = -1;
+        for (i = file_index*8; i < file_index*8+8; i++) {
+            if (b[i] == active_knight) break;
+        } 
+        if (i >= 0) {
+            b[destination_index] = active_knight;
+            b[i]                 = EMPTY;
+        } else {
+            printf("ERROR: INVALID KNIGHT MOVE? - knight file known\n");
+            return;
+        }
     } else {
         //we need to find the knight based on destination square
         int file_index = char_to_file_or_rank(destination[0]);
         int rank_index = char_to_file_or_rank(destination[1]);
 
-        int moving_knight = hunt_knight(b, destination_index, file_index, rank_index, active_knight);
+        int moving_knight = hunt_knight(b, file_index, rank_index, active_knight);
         if (moving_knight > 0) {
             b[destination_index] = active_knight;
             b[moving_knight]     = EMPTY;
@@ -220,7 +234,7 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
 }
 
 int
-hunt_knight(Piece *b, int destination_index, int file_index, int rank_index, Piece knight)
+hunt_knight(Piece *b, int file_index, int rank_index, Piece knight)
 {
     if (file_index - 2 >= 0) {
         if (rank_index - 1 >= 0) {
@@ -236,8 +250,7 @@ hunt_knight(Piece *b, int destination_index, int file_index, int rank_index, Pie
         }
         if (rank_index + 2 <= 7) {
             if (b[(file_index-1)*8+(rank_index+2)] == knight) return ((file_index-1)*8+(rank_index+2));
-
-        } 
+        }
     }
     if (file_index + 2 <= 7) {
         if (rank_index - 1 >= 0) {
@@ -255,6 +268,7 @@ hunt_knight(Piece *b, int destination_index, int file_index, int rank_index, Pie
             if (b[(file_index+1)*8+(rank_index+2)] == knight) return ((file_index+1)*8+(rank_index+2));
         }
     }
+    printf("%d%d ", file_index, rank_index);
     return -1;
 }
 
