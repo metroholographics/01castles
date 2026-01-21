@@ -58,7 +58,7 @@ int get_index_from_move(char file, char rank);
 
 void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
 void handle_knight_move(Piece *b, char *piece, char *destination, int color);
-int  hunt_knight(int destination_index, int file_index, int rank_index, Piece knight);
+int  hunt_knight(Piece *b, int destination_index, int file_index, int rank_index, Piece knight);
 
 
 #endif

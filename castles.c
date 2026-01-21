@@ -188,10 +188,11 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
     piece      = t.piece[color][0];
 
     switch (piece) {
-        case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color);
-        case 'N': handle_knight_move(b, t.piece[color], t.move_to[color], color);
+        case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color); break;
+        case 'N': handle_knight_move(b, t.piece[color], t.move_to[color], color); break;
     }
 }
+
 void
 handle_knight_move(Piece *b, char *piece, char *destination, int color)
 {
@@ -207,7 +208,7 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
         int file_index = char_to_file_or_rank(destination[0]);
         int rank_index = char_to_file_or_rank(destination[1]);
 
-        int moving_knight = hunt_knight(destination_index, file_index, rank_index, active_knight);
+        int moving_knight = hunt_knight(b, destination_index, file_index, rank_index, active_knight);
         if (moving_knight > 0) {
             b[destination_index] = active_knight;
             b[moving_knight]     = EMPTY;
@@ -216,13 +217,44 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
             return;
         }
     }
-
 }
 
 int
-hunt_knight(int destination_index, int file_index, int rank_index, Piece knight)
+hunt_knight(Piece *b, int destination_index, int file_index, int rank_index, Piece knight)
 {
+    if (file_index - 2 >= 0) {
+        if (rank_index - 1 >= 0) {
+            if (b[(file_index-2)*8+(rank_index-1)] == knight) return ((file_index-2)*8+(rank_index-1));
+        }
+        if (rank_index + 1 <= 7) {
+            if (b[(file_index-2)*8+(rank_index+1)] == knight) return ((file_index-2)*8+(rank_index+1));
+        }
+    }
+    if (file_index - 1 >= 0) {
+        if (rank_index - 2 >= 0) {
+            if (b[(file_index-1)*8+(rank_index-2)] == knight) return ((file_index-1)*8+(rank_index-2));
+        }
+        if (rank_index + 2 <= 7) {
+            if (b[(file_index-1)*8+(rank_index+2)] == knight) return ((file_index-1)*8+(rank_index+2));
 
+        } 
+    }
+    if (file_index + 2 <= 7) {
+        if (rank_index - 1 >= 0) {
+            if (b[(file_index+2)*8+(rank_index-1)] == knight) return ((file_index+2)*8+(rank_index-1));
+        }
+        if (rank_index + 1 <= 7) {
+            if (b[(file_index+2)*8+(rank_index+1)] == knight) return ((file_index+2)*8+(rank_index+1));
+        }
+    }
+    if (file_index + 1 <= 7) {
+        if (rank_index - 2 >= 0) {
+            if (b[(file_index+1)*8+(rank_index-2)] == knight) return ((file_index+1)*8+(rank_index-2));
+        }
+        if (rank_index + 2 <= 7) {
+            if (b[(file_index+1)*8+(rank_index+2)] == knight) return ((file_index+1)*8+(rank_index+2));
+        }
+    }
     return -1;
 }
 
