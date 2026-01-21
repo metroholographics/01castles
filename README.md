@@ -30,7 +30,7 @@ v0.1
     - [x] pawn moves
         - [x] normal
         - [x] capture and en passant
-    - [~] knight moves
+    - [x] knight moves
     - [ ] bishop moves
 - [ ] On-screen text box to paste pgn data
 

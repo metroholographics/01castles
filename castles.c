@@ -206,13 +206,16 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
         b[file_index*8+rank_index] = EMPTY;
     } else if (piece[1] != '\0') {
         int file_index = char_to_file_or_rank(piece[1]);
-        int i = -1;
-        for (i = file_index*8; i < file_index*8+8; i++) {
-            if (b[i] == active_knight) break;
+        int found_knight = -1;
+        for (int i = file_index*8; i < file_index*8+8; i++) {
+            if (b[i] == active_knight) {
+                found_knight = i;
+                break;
+            }
         } 
-        if (i >= 0) {
+        if (found_knight >= 0) {
             b[destination_index] = active_knight;
-            b[i]                 = EMPTY;
+            b[found_knight]      = EMPTY;
         } else {
             printf("ERROR: INVALID KNIGHT MOVE? - knight file known\n");
             return;
@@ -271,7 +274,6 @@ hunt_knight(Piece *b, int file_index, int rank_index, Piece knight)
     printf("%d%d ", file_index, rank_index);
     return -1;
 }
-
 
 void
 handle_pawn_move(Piece *b, char *piece, char *destination, int color)
