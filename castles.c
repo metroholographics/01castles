@@ -164,12 +164,12 @@ store_game_in_boards(TurnHistory *th, PGN_Game p)
     for (int i = 0; i < th->num_turns; i++) {
         PGN_Turn current_turn = p.move_buffer[i];
         copy_board(th->game_turns[board_index], th->game_turns[board_index-1]);
-        if (current_turn.white_move){
+        if (current_turn.white_move) {
             input_turn_on_board(th->game_turns[board_index], current_turn, PGN_WHITE);
         }
         board_index++;
         copy_board(th->game_turns[board_index], th->game_turns[board_index-1]);
-        if (current_turn.black_move){
+        if (current_turn.black_move) {
             input_turn_on_board(th->game_turns[board_index], current_turn, PGN_BLACK);
         }
         board_index++;
@@ -188,24 +188,70 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
     piece      = t.piece[color][0];
 
     switch (piece) {
-        case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color); break;
+        case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color);   break;
         case 'N': handle_knight_move(b, t.piece[color], t.move_to[color], color); break;
+        case 'B': handle_bishop_move(b,t.piece[color], t.move_to[color], color);  break;
     }
 }
+
+
+void
+handle_bishop_move(Piece *b, char *piece, char *destination, int color)
+{
+    Piece active_bishop     = (color == PGN_WHITE) ? W_BISHOP : B_BISHOP;
+    int   destination_index = get_index_from_move(destination[0], destination[1]);
+    if (destination_index < 0) {
+        printf("ERROR DESTINATION INDEX: BISHOP MOVE\n");
+        return;
+    }
+
+    if (piece[2] != '\0') {
+
+    } else if (piece[1] != '\0') {
+
+    } else {
+        int  file_index       = char_to_file_or_rank(destination[0]);
+        int  rank_index       = char_to_file_or_rank(destination[1]);
+        bool dest_dark_square = is_dark_square(file_index, rank_index);
+        int  found_index      = -1;
+        for (int f = 0; f < 8; f++) { 
+            for (int r = 0; r < 8; r++) {
+                if (b[f*8+r] == active_bishop) {
+                    if (is_dark_square(f,r) == dest_dark_square) {
+                        found_index = f*8+r;
+                        break;
+                    }
+                }
+            }
+            if (found_index >= 0) break;
+        }
+        if (found_index >= 0) {
+            b[destination_index] = active_bishop;
+            b[found_index]       = EMPTY;
+        } else {
+            printf("ERROR: INVALID BISHOP MOVE - normal\n");
+        }
+    }
+}
+
 
 void
 handle_knight_move(Piece *b, char *piece, char *destination, int color)
 {
-    Piece active_knight   = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT;
-    int destination_index = get_index_from_move(destination[0], destination[1]);
+    Piece active_knight     = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT;
+    int   destination_index = get_index_from_move(destination[0], destination[1]);
+    if (destination_index < 0) {
+        printf("ERROR DESTINATION INDEX: KNIGHT MOVE\n");
+        return;
+    }
     
     if (piece[2] != '\0') {
-        int file_index = char_to_file_or_rank(piece[1]);
-        int rank_index = char_to_file_or_rank(piece[2]);
+        int file_index             = char_to_file_or_rank(piece[1]);
+        int rank_index             = char_to_file_or_rank(piece[2]);
         b[destination_index]       = active_knight;
         b[file_index*8+rank_index] = EMPTY;
     } else if (piece[1] != '\0') {
-        int file_index = char_to_file_or_rank(piece[1]);
+        int file_index   = char_to_file_or_rank(piece[1]);
         int found_knight = -1;
         for (int i = file_index*8; i < file_index*8+8; i++) {
             if (b[i] == active_knight) {
@@ -222,9 +268,8 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
         }
     } else {
         //we need to find the knight based on destination square
-        int file_index = char_to_file_or_rank(destination[0]);
-        int rank_index = char_to_file_or_rank(destination[1]);
-
+        int file_index    = char_to_file_or_rank(destination[0]);
+        int rank_index    = char_to_file_or_rank(destination[1]);
         int moving_knight = hunt_knight(b, file_index, rank_index, active_knight);
         if (moving_knight > 0) {
             b[destination_index] = active_knight;
@@ -278,23 +323,22 @@ hunt_knight(Piece *b, int file_index, int rank_index, Piece knight)
 void
 handle_pawn_move(Piece *b, char *piece, char *destination, int color)
 {
-    int sign              = (color == PGN_WHITE) ? -1 : 1;
-    Piece active_pawn     = (color == PGN_WHITE) ? W_PAWN : B_PAWN;
-    int destination_index = get_index_from_move(destination[0], destination[1]);
+    int   sign              = (color == PGN_WHITE) ? -1 : 1;
+    Piece active_pawn       = (color == PGN_WHITE) ? W_PAWN : B_PAWN;
+    int   destination_index = get_index_from_move(destination[0], destination[1]);
     if (destination_index < 0) {
-        printf("ERROR DESTINATION INDEX");
+        printf("ERROR DESTINATION INDEX: PAWN MOVE\n");
         return;
     }
-
     //Normal pawn move (no file or rank disambiguation)
     if (piece[1] == '\0') {
         int i                 = destination_index;
         int moving_pawn_index = -1;
 
-        if (b[i + sign*2] == active_pawn) {moving_pawn_index = i + sign*2;}
-        if (b[i + sign]   == active_pawn) {moving_pawn_index = i + sign;}
+        if (b[i+sign*2] == active_pawn) {moving_pawn_index = i + sign*2;}
+        if (b[i+sign]   == active_pawn) {moving_pawn_index = i + sign;}
 
-        if (moving_pawn_index > 0) {
+        if (moving_pawn_index >= 0) {
             b[destination_index] = active_pawn;
             b[moving_pawn_index] = EMPTY;
         } else {
@@ -316,9 +360,9 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         } else {
             //en-passant
             Piece passing_pawn = (active_pawn == W_PAWN) ? B_PAWN : W_PAWN;
-            if (b[destination_index - sign] == passing_pawn) {
-                b[destination_index]        = active_pawn;
-                b[destination_index - sign] = EMPTY;
+            if (b[destination_index-sign] == passing_pawn) {
+                b[destination_index]      = active_pawn;
+                b[destination_index-sign] = EMPTY;
             } else {
                 printf("ERROR: INVALID PAWN MOVE? - en passant\n");
                 return;
@@ -371,6 +415,11 @@ get_index_from_move(char file, char rank) {
     return (f * 8) + r;
 }
 
+bool
+is_dark_square(int file, int rank)
+{
+    return ((file + rank) % 2 == 0);
+}
 
 void
 copy_board(Piece *target, Piece *source)
@@ -425,7 +474,7 @@ initialise_context(Context *c, const char *title, int width, int height, const c
 void
 populate_piece_sprite_array(SDL_FRect *sprite_array)
 {
-    sprite_array[EMPTY]    = (SDL_FRect) {0,    0, 0,          0};
+    sprite_array[EMPTY]    = (SDL_FRect) {0,    0,          0,          0};
     sprite_array[W_ROOK]   = (SDL_FRect) {0,    0, BOARD_TILE, BOARD_TILE};
     sprite_array[W_KNIGHT] = (SDL_FRect) {70,   0, BOARD_TILE, BOARD_TILE};
     sprite_array[W_BISHOP] = (SDL_FRect) {140,  0, BOARD_TILE, BOARD_TILE};

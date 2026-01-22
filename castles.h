@@ -53,12 +53,14 @@ void store_game_in_boards(TurnHistory *th, PGN_Game p);
 void copy_board(Piece *target, Piece *source);
 void input_turn_on_board(Piece* b, PGN_Turn t, int color);
 
-int char_to_file_or_rank(char c);
-int get_index_from_move(char file, char rank);
+int  char_to_file_or_rank(char c);
+int  get_index_from_move(char file, char rank);
+bool is_dark_square(int file, int rank);
+
 
 void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
 void handle_knight_move(Piece *b, char *piece, char *destination, int color);
 int  hunt_knight(Piece *b, int file_index, int rank_index, Piece knight);
-
+void handle_bishop_move(Piece *b, char *piece, char *destination, int color);
 
 #endif
