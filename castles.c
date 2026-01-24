@@ -113,7 +113,7 @@ main(int argc, char *argv[])
 
         if (trigger_board_refresh) {
             current_board_index = CLAMP_I(current_board_index, 0, turn_history.num_turns);
-            current_board = turn_history.game_turns[current_board_index];
+            current_board       = turn_history.game_turns[current_board_index];
             printf("%d ", current_board_index);
         }
         // Draw to board texture
@@ -198,7 +198,7 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
 void
 handle_rook_move(Piece *b, char *piece, char *destination, int color)
 {
-    Piece active_rook = (color == PGN_WHITE) ? W_ROOK : B_ROOK;
+    Piece active_rook       = (color == PGN_WHITE) ? W_ROOK : B_ROOK;
     int   destination_index = get_index_from_move(destination[0], destination[1]);
     if (destination_index < 0) {
         printf("ERROR DESTINATION INDEX: ROOK MOVE\n");
@@ -216,13 +216,10 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
         if (found_rook >= 0) {
             b[destination_index] = active_rook;
             b[found_rook]        = EMPTY;
-            //do the swap
         } else {
             //error
         }
-
     }
-
 }
 
 int
@@ -237,7 +234,7 @@ hunt_rook(Piece *b, int file_index, int rank_index, Piece rook)
     }
     if (found_rook_count == 0) {
         //rook not found in file, searching the rank
-        for (int i = rank_index; i < 7*8+8; i+=8) {
+        for (int i = rank_index; i < 8*8; i+=8) {
             if (b[i] == rook) max_rooks[found_rook_count++] = i;
         }
     }
@@ -254,7 +251,6 @@ hunt_rook(Piece *b, int file_index, int rank_index, Piece rook)
     } 
     return found_rook_index;
 }
-
 
 void
 handle_bishop_move(Piece *b, char *piece, char *destination, int color)
@@ -364,34 +360,34 @@ hunt_knight(Piece *b, int file_index, int rank_index, Piece knight)
 {
     if (file_index - 2 >= 0) {
         if (rank_index - 1 >= 0) {
-            if (b[(file_index-2)*8+(rank_index-1)] == knight) return ((file_index-2)*8+(rank_index-1));
+            if (b[(file_index-2)*8+(rank_index-1)] == knight) return ((file_index-2)*8+rank_index-1);
         }
         if (rank_index + 1 <= 7) {
-            if (b[(file_index-2)*8+(rank_index+1)] == knight) return ((file_index-2)*8+(rank_index+1));
+            if (b[(file_index-2)*8+(rank_index+1)] == knight) return ((file_index-2)*8+rank_index+1);
         }
     }
     if (file_index - 1 >= 0) {
         if (rank_index - 2 >= 0) {
-            if (b[(file_index-1)*8+(rank_index-2)] == knight) return ((file_index-1)*8+(rank_index-2));
+            if (b[(file_index-1)*8+(rank_index-2)] == knight) return ((file_index-1)*8+rank_index-2);
         }
         if (rank_index + 2 <= 7) {
-            if (b[(file_index-1)*8+(rank_index+2)] == knight) return ((file_index-1)*8+(rank_index+2));
+            if (b[(file_index-1)*8+(rank_index+2)] == knight) return ((file_index-1)*8+rank_index+2);
         }
     }
     if (file_index + 2 <= 7) {
         if (rank_index - 1 >= 0) {
-            if (b[(file_index+2)*8+(rank_index-1)] == knight) return ((file_index+2)*8+(rank_index-1));
+            if (b[(file_index+2)*8+(rank_index-1)] == knight) return ((file_index+2)*8+rank_index-1);
         }
         if (rank_index + 1 <= 7) {
-            if (b[(file_index+2)*8+(rank_index+1)] == knight) return ((file_index+2)*8+(rank_index+1));
+            if (b[(file_index+2)*8+(rank_index+1)] == knight) return ((file_index+2)*8+rank_index+1);
         }
     }
     if (file_index + 1 <= 7) {
         if (rank_index - 2 >= 0) {
-            if (b[(file_index+1)*8+(rank_index-2)] == knight) return ((file_index+1)*8+(rank_index-2));
+            if (b[(file_index+1)*8+(rank_index-2)] == knight) return ((file_index+1)*8+rank_index-2);
         }
         if (rank_index + 2 <= 7) {
-            if (b[(file_index+1)*8+(rank_index+2)] == knight) return ((file_index+1)*8+(rank_index+2));
+            if (b[(file_index+1)*8+(rank_index+2)] == knight) return ((file_index+1)*8+rank_index+2);
         }
     }
     printf("%d%d ", file_index, rank_index);
@@ -574,22 +570,18 @@ destroy_context(Context *c)
         SDL_DestroyTexture(c->board_texture);
         printf("**destroyed board texture...\n");
     }
-
     if (c->spritesheet) {
             SDL_DestroyTexture(c->spritesheet);
             printf("**destroyed spritesheet...\n");
     }
-
     if (c->renderer) {
         SDL_DestroyRenderer(c->renderer);
         printf("**destroyed renderer...\n");
     }
-
     if (c->window) {
         SDL_DestroyWindow(c->window);
         printf("**destroyed window...\n");
     }
-
     SDL_Quit();
     printf("**SDL de-initialized...\n");
 }

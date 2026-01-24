@@ -29,8 +29,8 @@ v0.1
     - [x] cache each turn and step through boards
     - [x] pawn moves
     - [x] knight moves
-    - [~] bishop moves
-    - [ ] rook moves
+    - [x] bishop moves
+    - [!] rook moves
     - [ ] Cleanup A - assert macro?
 - [ ] On-screen text box to paste pgn data
 
