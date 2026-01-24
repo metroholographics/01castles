@@ -28,8 +28,6 @@ v0.1
 - [!] Step through move history on board
     - [x] cache each turn and step through boards
     - [x] pawn moves
-        - [x] normal
-        - [x] capture and en passant
     - [x] knight moves
     - [~] bishop moves
     - [ ] rook moves
@@ -41,3 +39,5 @@ v0.1
 ### CLEANUP
 A: assert/validate return values from functions finding indexes into the array throughout:
     - get_index_from_move, char_to_file_or_rank
+B: manually create a PGN which tests edge-cases?:
+    - en-passant, different levels of disambiguation

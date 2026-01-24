@@ -191,8 +191,70 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
         case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color);   break;
         case 'N': handle_knight_move(b, t.piece[color], t.move_to[color], color); break;
         case 'B': handle_bishop_move(b,t.piece[color], t.move_to[color], color);  break;
+        case 'R': handle_rook_move(b, t.piece[color], t.move_to[color], color);   break;
     }
 }
+
+void
+handle_rook_move(Piece *b, char *piece, char *destination, int color)
+{
+    Piece active_rook = (color == PGN_WHITE) ? W_ROOK : B_ROOK;
+    int   destination_index = get_index_from_move(destination[0], destination[1]);
+    if (destination_index < 0) {
+        printf("ERROR DESTINATION INDEX: ROOK MOVE\n");
+        return;
+    }
+
+    if (piece[2] != '\0') {
+
+    } else if (piece[1] != '\0') {
+
+    } else {
+        int file_index = char_to_file_or_rank(destination[0]);
+        int rank_index = char_to_file_or_rank(destination[1]);
+        int found_rook = hunt_rook(b, file_index, rank_index, active_rook);
+        if (found_rook >= 0) {
+            b[destination_index] = active_rook;
+            b[found_rook]        = EMPTY;
+            //do the swap
+        } else {
+            //error
+        }
+
+    }
+
+}
+
+int
+hunt_rook(Piece *b, int file_index, int rank_index, Piece rook)
+{
+    int max_rooks[8]     = {0};
+    int found_rook_count = 0;
+    int found_rook_index = -1;
+    //first searching the file
+    for (int i = file_index*8; i < file_index*8+8; i++) {
+        if (b[i] == rook) max_rooks[found_rook_count++] = i;
+    }
+    if (found_rook_count == 0) {
+        //rook not found in file, searching the rank
+        for (int i = rank_index; i < 7*8+8; i+=8) {
+            if (b[i] == rook) max_rooks[found_rook_count++] = i;
+        }
+    }
+    if (found_rook_count > 0) {
+        int dest_index   = file_index*8+rank_index;
+        int lowest_delta = 100;
+        for (int i = 0; i < found_rook_count; i++) {
+            int delta = ABS_I((dest_index - max_rooks[i]));
+            if (delta < lowest_delta) {
+                lowest_delta     = delta;
+                found_rook_index = max_rooks[i];
+            }
+        }
+    } 
+    return found_rook_index;
+}
+
 
 void
 handle_bishop_move(Piece *b, char *piece, char *destination, int color)

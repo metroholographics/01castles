@@ -6,6 +6,8 @@
 
 #define ARRAY_SIZE(a)      ((int)((sizeof((a))) / (sizeof((a)[0]))))
 #define CLAMP_I(x,min,max) ((int)(((x) < (min)) ? (min) : ((x) > (max)) ? (max) : (x)))
+#define ABS_I(x)           ((int)((x) < 0 ? (-x) : (x)))
+
 
 #define CLEAR_COLOR  (SDL_Color) {145, 163, 170, 255}
 #define LIGHT_SQUARE (SDL_Color) {145, 163, 170, 255}
@@ -62,5 +64,8 @@ void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
 void handle_knight_move(Piece *b, char *piece, char *destination, int color);
 int  hunt_knight(Piece *b, int file_index, int rank_index, Piece knight);
 void handle_bishop_move(Piece *b, char *piece, char *destination, int color);
+void handle_rook_move(Piece *b, char *piece, char *destination, int color);
+int  hunt_rook(Piece *b, int file_index, int rank_index, Piece rook);
+
 
 #endif
