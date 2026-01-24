@@ -31,7 +31,13 @@ v0.1
         - [x] normal
         - [x] capture and en passant
     - [x] knight moves
-    - [ ] bishop moves
+    - [~] bishop moves
+    - [ ] rook moves
+    - [ ] Cleanup A - assert macro?
 - [ ] On-screen text box to paste pgn data
 
 ~~~~~~~~
+
+### CLEANUP
+A: assert/validate return values from functions finding indexes into the array throughout:
+    - get_index_from_move, char_to_file_or_rank
