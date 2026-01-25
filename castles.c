@@ -157,7 +157,7 @@ main(int argc, char *argv[])
 void
 store_game_in_boards(TurnHistory *th, PGN_Game p)
 {
-    th->num_turns = p.num_turns;
+    th->num_turns = p.num_turns*2;
     initialise_default_board(th->game_turns[0]);
 
     int board_index = 1;
@@ -206,9 +206,20 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
     }
 
     if (piece[2] != '\0') {
-
+        int piece_file             = char_to_file_or_rank(piece[1]);
+        int piece_rank             = char_to_file_or_rank(piece[2]);
+        b[destination_index]       = active_rook;
+        b[piece_file*8+piece_rank] = EMPTY;
     } else if (piece[1] != '\0') {
-
+        int file_index = char_to_file_or_rank(piece[1]);
+        int rank_index = char_to_file_or_rank(destination[1]);
+        int found_rook = hunt_rook(b, file_index, rank_index, active_rook);
+        if (found_rook >= 0) {
+            b[destination_index] = active_rook;
+            b[found_rook]        = EMPTY;
+        } else {
+            printf("ERROR: INVALID ROOK MOVE - file known\n");
+        }
     } else {
         int file_index = char_to_file_or_rank(destination[0]);
         int rank_index = char_to_file_or_rank(destination[1]);
@@ -217,7 +228,7 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
             b[destination_index] = active_rook;
             b[found_rook]        = EMPTY;
         } else {
-            //error
+            printf("ERROR: INVALID ROOK MOVE - normal\n");
         }
     }
 }
@@ -266,10 +277,10 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
     bool dest_dark_square = is_dark_square(file_index, rank_index);
 
     if (piece[2] != '\0') {
-        int piece_file  = char_to_file_or_rank(piece[1]);
-        int piece_rank  = char_to_file_or_rank(piece[2]);
-        b[destination_index]             = active_bishop;
-        b[piece_file*8+piece_rank]       = 0;
+        int piece_file             = char_to_file_or_rank(piece[1]);
+        int piece_rank             = char_to_file_or_rank(piece[2]);
+        b[destination_index]       = active_bishop;
+        b[piece_file*8+piece_rank] = 0;
     } else if (piece[1] != '\0') {
         int found_index = -1;
         for (int i = 0; i < 8; i++) {
