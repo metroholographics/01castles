@@ -26,6 +26,7 @@ v0.1
         - [x] Castle
         - [x] Promotion
 - [!] Step through move history on board
+    - [ ] figure out turn history buffer/pgn game turns relationship
     - [x] cache each turn and step through boards
     - [x] pawn moves
         - [ ] check for closest piece (*Cleanup B)

@@ -174,6 +174,7 @@ store_game_in_boards(TurnHistory *th, PGN_Game p)
         }
         board_index++;
     }
+    printf("board index: %d\n", board_index);
 }
 
 void
