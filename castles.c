@@ -157,7 +157,7 @@ main(int argc, char *argv[])
 void
 store_game_in_boards(TurnHistory *th, PGN_Game p)
 {
-    th->num_turns = p.num_turns*2;
+    th->num_turns = p.num_turns*2+2;
     initialise_default_board(th->game_turns[0]);
 
     int board_index = 1;
