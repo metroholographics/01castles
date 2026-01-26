@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/2examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -193,7 +193,81 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
         case 'N': handle_knight_move(b, t.piece[color], t.move_to[color], color); break;
         case 'B': handle_bishop_move(b,t.piece[color], t.move_to[color], color);  break;
         case 'R': handle_rook_move(b, t.piece[color], t.move_to[color], color);   break;
+        case 'Q': handle_queen_move(b, t.piece[color], t.move_to[color], color);  break;
     }
+}
+
+void
+handle_queen_move(Piece *b, char *piece, char *destination, int color)
+{
+    Piece active_queen      = (color == PGN_WHITE) ? W_QUEEN : B_QUEEN;
+    int   destination_index = get_index_from_move(destination[0], destination[1]);
+    if (destination_index < 0) {
+        printf("ERROR DESTINATION INDEX: QUEEN MOVE\n");
+        return;
+    }
+
+    if (piece[2] != '\0') {
+        int file_index = char_to_file_or_rank(piece[1]);
+        int rank_index = char_to_file_or_rank(piece[2]);
+        b[destination_index]       = active_queen;
+        b[file_index*8+rank_index] = EMPTY;
+    } else if (piece[1] != '\0') {
+        int found_queen = -1;
+        int file_index = char_to_file_or_rank(piece[1]);
+        file_index *= 8;
+        for (int i = file_index; i < file_index+8; i++) {
+            if (b[i] == active_queen) {
+                if (validate_queen_move(b, i, destination_index)) {
+                    found_queen = i;
+                    break;
+                }
+            }
+        }
+        if (found_queen >= 0) {
+            b[destination_index] = active_queen;
+            b[found_queen]       = EMPTY;
+        } else {
+            printf("ERROR: INVALID QUEEN MOVE - file known\n");
+        }
+    } else {
+        int found_queen = -1;
+        for (int i = 0; i < 64; i++) {
+            if (b[i] == active_queen) {
+                if (validate_queen_move(b, i, destination_index)) {
+                    found_queen = i;
+                    break;
+                }
+            }
+        }
+        if (found_queen >= 0) {
+            b[destination_index] = active_queen;
+            b[found_queen]       = EMPTY;
+        } else {
+            printf("ERROR: INVALID QUEEN MOVE - normal\n");
+        }
+    }
+}
+
+bool validate_queen_move(Piece* b, int origin_index, int destination_index)
+{
+    int origin_file = origin_index / 8;
+    int origin_rank = origin_index % 8;
+    int dest_file   = destination_index / 8;
+    int dest_rank   = destination_index % 8;
+    int v_f         = dest_file - origin_file;
+    int v_r         = dest_rank - origin_rank;
+    int sign_f      = ((v_f == 0) ? 0 : v_f/ABS_I(v_f));
+    int sign_r      = ((v_r == 0) ? 0 : v_r/ABS_I(v_r));
+
+    while (origin_index != destination_index) {
+        origin_index += 8*sign_f;
+        origin_index += sign_r;
+        if (origin_index == destination_index)      return true;
+        if (origin_index < 0 || origin_index >= 64) return false;
+        if (b[origin_index] != EMPTY)               return false;
+    }
+    return (origin_index == destination_index);
 }
 
 void

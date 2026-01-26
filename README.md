@@ -26,7 +26,7 @@ v0.1
         - [x] Castle
         - [x] Promotion
 - [!] Step through move history on board
-    - [~] figure out turn history buffer/pgn game turns relationship
+    - [x] figure out turn history buffer/pgn game turns relationship
     - [x] cache each turn and step through boards
     - [x] pawn moves
         - [ ] check for closest piece (*Cleanup B)
@@ -34,7 +34,13 @@ v0.1
     - [x] bishop moves
         - [ ] check for closest piece (*Cleanup B)
     - [x] rook moves
+    - [~] queen moves
+    - [ ] king moves
+    - [ ] castle
+    - [ ] promotion
+    - [ ] Cleanup C
     - [ ] Cleanup A - assert macro?
+- [ ] Flip board
 - [ ] On-screen text box to paste pgn data
 
 ~~~~~~~~
@@ -43,5 +49,6 @@ v0.1
 A: assert/validate return values from functions finding indexes into the array throughout:
     - get_index_from_move, char_to_file_or_rank
 B: For Bishop, Queen, Pawn, make sure the closest found piece is moving (look at hunt_rook for how this is done?)
-C: manually create a PGN which tests edge-cases?:
+C: Can we simplify the hunting moves? (all pieces)
+D: manually create a PGN which tests edge-cases?:
     - en-passant, different levels of disambiguation

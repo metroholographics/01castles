@@ -16,7 +16,7 @@
 const int WINDOW_WIDTH  = 900;
 const int WINDOW_HEIGHT = 600;
 const int BOARD_SIZE    = 560;
-const int BOARD_TILE    = 70;
+const int BOARD_TILE    = BOARD_SIZE / 8;
 const int FPS           = 30;
 
 typedef enum {
@@ -32,7 +32,7 @@ typedef enum {
 
 typedef struct {
     Piece game_turns[PGN_MAX_TURNS*2][8*8];
-    int num_turns;
+    int   num_turns;
 } TurnHistory;
 
 typedef struct {
@@ -66,6 +66,7 @@ int  hunt_knight(Piece *b, int file_index, int rank_index, Piece knight);
 void handle_bishop_move(Piece *b, char *piece, char *destination, int color);
 void handle_rook_move(Piece *b, char *piece, char *destination, int color);
 int  hunt_rook(Piece *b, int file_index, int rank_index, Piece rook);
-
+void handle_queen_move(Piece *b, char *piece, char *destination, int color);
+bool validate_queen_move(Piece *b, int origin_index, int destination_index);
 
 #endif
