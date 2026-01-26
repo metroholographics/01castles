@@ -26,14 +26,14 @@ v0.1
         - [x] Castle
         - [x] Promotion
 - [!] Step through move history on board
-    - [ ] figure out turn history buffer/pgn game turns relationship
+    - [~] figure out turn history buffer/pgn game turns relationship
     - [x] cache each turn and step through boards
     - [x] pawn moves
         - [ ] check for closest piece (*Cleanup B)
     - [x] knight moves
     - [x] bishop moves
         - [ ] check for closest piece (*Cleanup B)
-    - [~] rook moves
+    - [x] rook moves
     - [ ] Cleanup A - assert macro?
 - [ ] On-screen text box to paste pgn data
 

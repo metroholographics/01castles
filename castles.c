@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/2examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -157,11 +157,11 @@ main(int argc, char *argv[])
 void
 store_game_in_boards(TurnHistory *th, PGN_Game p)
 {
-    th->num_turns = p.num_turns*2+2;
+    th->num_turns = (p.num_turns+1)*2;
     initialise_default_board(th->game_turns[0]);
 
     int board_index = 1;
-    for (int i = 0; i < th->num_turns; i++) {
+    for (int i = 0; i < p.num_turns+1; i++) {
         PGN_Turn current_turn = p.move_buffer[i];
         copy_board(th->game_turns[board_index], th->game_turns[board_index-1]);
         if (current_turn.white_move) {
