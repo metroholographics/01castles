@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/3examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -184,6 +184,9 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
     bool promotion = t.promotion[color];
 
     //TODO: handle castle and promotion moves first if exist
+    if (castle) {
+        handle_castle(b, t.piece, t.move_to, color);
+    }
 
     char piece = '\0';
     piece      = t.piece[color][0];
@@ -196,6 +199,58 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
         case 'Q': handle_queen_move(b, t.piece[color], t.move_to[color], color);  break;
     }
 }
+
+void
+handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
+{
+    Piece active_king = (color == PGN_WHITE) ? W_KING : B_KING;
+    Piece active_rook = (color == PGN_WHITE) ? W_ROOK : B_ROOK;
+
+    bool valid_input = piece[color][0] == 'K' && piece[color+2][0] == 'R';
+    if (!valid_input) {
+        printf("ERROR CASTLE: wrong PGN input?\n");
+        return;
+    }
+    bool kingside  = (destination[color][0] == 'g');
+    bool queenside = (destination[color][0] == 'c');
+    if ((!kingside && !queenside) || (kingside && queenside)) {
+        printf("ERROR CASTLE: destination\n");
+        return;
+    }
+
+    int k_dest_index, k_origin_index;
+    int r_dest_index, r_origin_index;
+    k_dest_index = k_origin_index = -1;
+    r_dest_index = r_origin_index = -1;
+
+    if (kingside) {
+        k_dest_index   = (color == PGN_WHITE) ? G*8+0 : G*8+7;
+        k_origin_index = (color == PGN_WHITE) ? E*8+0 : E*8+7;
+        r_dest_index   = (color == PGN_WHITE) ? F*8+0 : F*8+7;
+        r_origin_index = (color == PGN_WHITE) ? H*8+0 : H*8+7;
+    } else if (queenside) {
+        k_dest_index   = (color == PGN_WHITE) ? C*8+0 : C*8+7;
+        k_origin_index = (color == PGN_WHITE) ? E*8+0 : E*8+7;
+        r_dest_index   = (color == PGN_WHITE) ? D*8+0 : D*8+7;
+        r_origin_index = (color == PGN_WHITE) ? A*8+0 : A*8+7;
+    }
+
+    if (b[k_origin_index] != active_king) {
+        printf("ERROR CASTLE: no king\n");
+        return;
+    }
+    if (b[r_origin_index] != active_rook) {
+        printf("ERROR CASTLE: no rook\n");
+        return;
+    }
+    b[k_dest_index]   = active_king;
+    b[k_origin_index] = EMPTY;
+    b[r_dest_index]   = active_rook;
+    b[r_origin_index] = EMPTY;
+    return;
+}
+
+
 
 void
 handle_queen_move(Piece *b, char *piece, char *destination, int color)

@@ -34,9 +34,9 @@ v0.1
     - [x] bishop moves
         - [ ] check for closest piece (*Cleanup B)
     - [x] rook moves
-    - [~] queen moves
+    - [x] queen moves
+    - [~] castle
     - [ ] king moves
-    - [ ] castle
     - [ ] promotion
     - [ ] Cleanup C
     - [ ] Cleanup A - assert macro?
@@ -51,4 +51,4 @@ A: assert/validate return values from functions finding indexes into the array t
 B: For Bishop, Queen, Pawn, make sure the closest found piece is moving (look at hunt_rook for how this is done?)
 C: Can we simplify the hunting moves? (all pieces)
 D: manually create a PGN which tests edge-cases?:
-    - en-passant, different levels of disambiguation
+    - en-passant, different levels of disambiguation, queenside castle,

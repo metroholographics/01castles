@@ -68,5 +68,7 @@ void handle_rook_move(Piece *b, char *piece, char *destination, int color);
 int  hunt_rook(Piece *b, int file_index, int rank_index, Piece rook);
 void handle_queen_move(Piece *b, char *piece, char *destination, int color);
 bool validate_queen_move(Piece *b, int origin_index, int destination_index);
+void handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color);
+
 
 #endif
