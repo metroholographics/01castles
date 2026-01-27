@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/3examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -186,6 +186,7 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
     //TODO: handle castle and promotion moves first if exist
     if (castle) {
         handle_castle(b, t.piece, t.move_to, color);
+        return;
     }
 
     char piece = '\0';
@@ -197,6 +198,30 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
         case 'B': handle_bishop_move(b,t.piece[color], t.move_to[color], color);  break;
         case 'R': handle_rook_move(b, t.piece[color], t.move_to[color], color);   break;
         case 'Q': handle_queen_move(b, t.piece[color], t.move_to[color], color);  break;
+        case 'K': handle_king_move(b, t.move_to[color], color);   break;
+    }
+}
+
+
+void
+handle_king_move(Piece *b, char *destination, int color)
+{
+    Piece active_king = (color == PGN_WHITE) ? W_KING : B_KING;
+    int   destination_index = get_index_from_move(destination[0], destination[1]);
+    int   found_king = -1;
+
+    for (int i = 0; i < 64; i++) {
+        if (b[i] == active_king) {
+            found_king = i;
+            break;
+        }
+    }
+
+    if (found_king >= 0) {
+        b[destination_index] = active_king;
+        b[found_king]        = EMPTY;
+    } else {
+        printf("ERROR KING MOVE\n");
     }
 }
 
@@ -249,8 +274,6 @@ handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
     b[r_origin_index] = EMPTY;
     return;
 }
-
-
 
 void
 handle_queen_move(Piece *b, char *piece, char *destination, int color)

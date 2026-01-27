@@ -35,11 +35,12 @@ v0.1
         - [ ] check for closest piece (*Cleanup B)
     - [x] rook moves
     - [x] queen moves
-    - [~] castle
-    - [ ] king moves
+    - [x] castle
+    - [~] king moves
     - [ ] promotion
     - [ ] Cleanup C
     - [ ] Cleanup A - assert macro?
+- [ ] Strip variations from PGN_Reader
 - [ ] Flip board
 - [ ] On-screen text box to paste pgn data
 

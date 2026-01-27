@@ -249,6 +249,10 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         while ((c = getc(f)) != '\n');
         //ungetc(c,f);
     }
+    if (file_check_nextc(f, '(')) {
+        c = getc(f);
+        while ((c = getc(f)) != ')');
+    }
 
     // for (int i = 0; i < black_len; i++) {
     //     char j = black_move_buffer[i];
