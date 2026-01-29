@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/4examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -189,6 +189,11 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
         return;
     }
 
+    if (promotion) {
+        handle_promotion(b, t.piece, t.move_to[color],t.promotion_piece[color], color);
+        return;
+    }
+
     char piece = '\0';
     piece      = t.piece[color][0];
 
@@ -198,30 +203,37 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
         case 'B': handle_bishop_move(b,t.piece[color], t.move_to[color], color);  break;
         case 'R': handle_rook_move(b, t.piece[color], t.move_to[color], color);   break;
         case 'Q': handle_queen_move(b, t.piece[color], t.move_to[color], color);  break;
-        case 'K': handle_king_move(b, t.move_to[color], color);   break;
+        case 'K': handle_king_move(b, t.move_to[color], color);                   break;
     }
 }
 
-
 void
-handle_king_move(Piece *b, char *destination, int color)
+handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece,int color)
 {
-    Piece active_king = (color == PGN_WHITE) ? W_KING : B_KING;
-    int   destination_index = get_index_from_move(destination[0], destination[1]);
-    int   found_king = -1;
-
-    for (int i = 0; i < 64; i++) {
-        if (b[i] == active_king) {
-            found_king = i;
-            break;
-        }
+    bool valid_input = piece[color][0] == 'P';
+    if (!valid_input) {
+        printf("ERROR PROMOTION: not a pawn moving?\n");
+        return;
     }
 
-    if (found_king >= 0) {
-        b[destination_index] = active_king;
-        b[found_king]        = EMPTY;
+    char pawn[2] = {'P', '\0'};
+    handle_pawn_move(b, pawn, destination, color);
+
+    int destination_index = get_index_from_move(destination[0], destination[1]);
+    Piece promotion_piece = EMPTY;
+
+    switch (prom_piece[0]) {
+        case 'Q': promotion_piece = (color == PGN_WHITE) ? W_QUEEN  : B_QUEEN;  break;
+        case 'R': promotion_piece = (color == PGN_WHITE) ? W_ROOK   : B_ROOK;   break;
+        case 'B': promotion_piece = (color == PGN_WHITE) ? W_BISHOP : B_BISHOP; break;
+        case 'N': promotion_piece = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT; break;
+        default : promotion_piece = EMPTY;                                      break;
+    }
+
+    if (promotion_piece != EMPTY) {
+        b[destination_index] = promotion_piece;
     } else {
-        printf("ERROR KING MOVE\n");
+        printf("ERROR PROMTION: wrong piece?\n");
     }
 }
 
@@ -273,6 +285,28 @@ handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
     b[r_dest_index]   = active_rook;
     b[r_origin_index] = EMPTY;
     return;
+}
+
+void
+handle_king_move(Piece *b, char *destination, int color)
+{
+    Piece active_king = (color == PGN_WHITE) ? W_KING : B_KING;
+    int   destination_index = get_index_from_move(destination[0], destination[1]);
+    int   found_king = -1;
+
+    for (int i = 0; i < 64; i++) {
+        if (b[i] == active_king) {
+            found_king = i;
+            break;
+        }
+    }
+
+    if (found_king >= 0) {
+        b[destination_index] = active_king;
+        b[found_king]        = EMPTY;
+    } else {
+        printf("ERROR KING MOVE\n");
+    }
 }
 
 void

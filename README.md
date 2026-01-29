@@ -36,13 +36,18 @@ v0.1
     - [x] rook moves
     - [x] queen moves
     - [x] castle
-    - [~] king moves
-    - [ ] promotion
+    - [x] king moves
+    - [~] promotion
+        - test
+    - [ ] fix pgn_reader reading all turns
     - [ ] Cleanup C
     - [ ] Cleanup A - assert macro?
-- [ ] Strip variations from PGN_Reader
+- [!] Strip variations from PGN_Reader
+    - [ ] test this more
 - [ ] Flip board
+- [ ] Game effects
 - [ ] On-screen text box to paste pgn data
+- [ ] Better PGN error handling
 
 ~~~~~~~~
 
@@ -52,4 +57,4 @@ A: assert/validate return values from functions finding indexes into the array t
 B: For Bishop, Queen, Pawn, make sure the closest found piece is moving (look at hunt_rook for how this is done?)
 C: Can we simplify the hunting moves? (all pieces)
 D: manually create a PGN which tests edge-cases?:
-    - en-passant, different levels of disambiguation, queenside castle,
+    - en-passant, different levels of disambiguation, queenside castle, capturepromotion,
