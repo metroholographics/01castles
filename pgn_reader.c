@@ -206,6 +206,8 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         white_len = pgn_read_move(white_move_buffer, 9, f);
         if (white_move_buffer[white_len-1] == '#') {
             //parse move: checkmate
+            pgn_populate_game_turn(t, white_move_buffer, white_len, PGN_WHITE);
+            t->white_move = true;
             return PGN_ERR_ENDGAME;
         }
         if (white_len <= 0) {

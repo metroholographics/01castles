@@ -37,9 +37,8 @@ v0.1
     - [x] queen moves
     - [x] castle
     - [x] king moves
-    - [~] promotion
-        - test
-    - [ ] fix pgn_reader reading all turns
+    - [x] promotion
+    - [~] fix pgn_reader reading all turns
     - [ ] Cleanup C
     - [ ] Cleanup A - assert macro?
 - [!] Strip variations from PGN_Reader
