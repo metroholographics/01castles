@@ -29,16 +29,15 @@ v0.1
     - [x] figure out turn history buffer/pgn game turns relationship
     - [x] cache each turn and step through boards
     - [x] pawn moves
-        - [ ] check for closest piece (*Cleanup B)
     - [x] knight moves
+        = [ ] handle multiple knights on file when file known
     - [x] bishop moves
-        - [ ] check for closest piece (*Cleanup B)
     - [x] rook moves
     - [x] queen moves
     - [x] castle
     - [x] king moves
     - [x] promotion
-    - [~] fix pgn_reader reading all turns
+    - [x] fix pgn_reader reading all turns
     - [ ] Cleanup C
     - [ ] Cleanup A - assert macro?
 - [!] Strip variations from PGN_Reader
@@ -56,4 +55,4 @@ A: assert/validate return values from functions finding indexes into the array t
 B: For Bishop, Queen, Pawn, make sure the closest found piece is moving (look at hunt_rook for how this is done?)
 C: Can we simplify the hunting moves? (all pieces)
 D: manually create a PGN which tests edge-cases?:
-    - en-passant, different levels of disambiguation, queenside castle, capturepromotion,
+    - en-passant, different levels of disambiguation, queenside castle, capturepromotion, bishops/queens on same diagonal
