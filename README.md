@@ -43,7 +43,8 @@ v0.1
     - [ ] Cleanup A - assert macro?
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
-- [ ] Flip board
+- [!] Flip board
+    - [ ] Make this more generic
 - [ ] Game effects
 - [ ] On-screen text box to paste pgn data
 - [ ] Better PGN error handling

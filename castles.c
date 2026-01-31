@@ -30,8 +30,8 @@ initialise_default_board(Piece *p)
     p[H*8+0] = W_ROOK;   p[H*8+7] = B_ROOK;
 
     for (int i = 0; i < 8; i++) {
-        p[i*8+1] = W_PAWN;
-        p[i*8+6] = B_PAWN;
+        p[i * 8 + 1] = W_PAWN;
+        p[i * 8 + 6] = B_PAWN;
     }
 }
 
@@ -77,13 +77,20 @@ main(int argc, char *argv[])
     current_board = turn_history.game_turns[current_board_index];
     if (DEBUG) {
         printf("Grid:%d\n", ARRAY_SIZE(turn_history.game_turns[current_board_index]));
-        for (int f = 0; f < 8; f++) {
-            for (int r = 0; r < 8; r++) {
-                printf(".%d.", current_board[f*8+r]);
+         for (int r = 7; r >= 0; r--) {
+            for (int f = 0; f < 8; f++) {
+                printf("%2d.", current_board[f*8+r]);
             }
             printf("\n");
         }
     }
+    //     for (int f = 0; f < 8; f++) {
+    //         for (int r = 0; r < 8; r++) {
+    //             printf(".%d.", current_board[f*8+r]);
+    //         }
+    //         printf("\n");
+    //     }
+    // }
 
     bool running = true;
     SDL_Event e;
@@ -121,11 +128,11 @@ main(int argc, char *argv[])
         r_c = CLEAR_COLOR;
         SDL_SetRenderDrawColor(context.renderer, r_c.r, r_c.g, r_c.b, r_c.a);
         SDL_RenderClear(context.renderer);
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                Piece p = current_board[row * 8 + col];
-                SDL_FRect d = (SDL_FRect){col*BOARD_TILE, row*BOARD_TILE, BOARD_TILE, BOARD_TILE};
-                SDL_Color sq_c = (((row + col) % 2 == 0 ) ? DARK_SQUARE : LIGHT_SQUARE);
+        for (int c = 7; c >= 0; c--) {
+            for (int f = 0; f < 8; f++) {
+                Piece p = current_board[f * 8 + c];
+                SDL_FRect d = (SDL_FRect){f*BOARD_TILE, (7-c)*BOARD_TILE, BOARD_TILE, BOARD_TILE};
+                SDL_Color sq_c = (((f + c) % 2 == 0 ) ? DARK_SQUARE : LIGHT_SQUARE);
                 // Render board square
                 SDL_SetRenderDrawColor(context.renderer, sq_c.r, sq_c.g, sq_c.b, sq_c.a);
                 SDL_RenderFillRect(context.renderer, &d);
