@@ -43,7 +43,7 @@ typedef struct {
 } Context;
 
 
-bool initialise_context(Context *c, const char *title, int width, int height, 
+bool initialise_context(Context *c, const char *title, int width, int height,
     const char *spritesheet);
 void destroy_context(Context *c);
 
@@ -63,6 +63,7 @@ bool trace_clear_line(Piece *b, int origin_index, int destination_index);
 void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
 void handle_knight_move(Piece *b, char *piece, char *destination, int color);
 int  hunt_knight(Piece *b, int destination_index, Piece knight);
+bool validate_knight_move(int origin_index, int destination_index);
 void handle_bishop_move(Piece *b, char *piece, char *destination, int color);
 void handle_rook_move(Piece *b, char *piece, char *destination, int color);
 int  hunt_rook(Piece *b, int file_index, int rank_index, Piece rook);

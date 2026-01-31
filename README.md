@@ -30,7 +30,6 @@ v0.1
     - [x] cache each turn and step through boards
     - [x] pawn moves
     - [x] knight moves
-        = [ ] handle multiple knights on file when file known
     - [x] bishop moves
     - [x] rook moves
     - [x] queen moves

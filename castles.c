@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/4examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -426,7 +426,7 @@ hunt_rook(Piece *b, int file_index, int rank_index, Piece rook)
                 found_rook_index = max_rooks[i];
             }
         }
-    } 
+    }
     return found_rook_index;
 }
 
@@ -465,7 +465,7 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
             return;
         }
     } else {
-        for (int f = 0; f < 8; f++) { 
+        for (int f = 0; f < 8; f++) {
             for (int r = 0; r < 8; r++) {
                 if (b[f*8+r] == active_bishop) {
                     if (is_dark_square(f,r) == dest_dark_square) {
@@ -513,12 +513,16 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
         int found_knight = -1;
         for (int i = file_index*8; i < file_index*8+8; i++) {
             if (b[i] == active_knight) {
-                //TODO:::Do a check here to see if the found knight can move into the dest.
-                //below is wrong
-                if (hunt_knight(b, destination_index, active_knight) == i) {
+                if (validate_knight_move(i, destination_index)) {
                     found_knight = i;
                     break;
                 }
+                //TODO:::Do a check here to see if the found knight can move into the dest.
+                //below is wrong
+                // if (hunt_knight(b, destination_index, active_knight) == i) {
+                //     found_knight = i;
+                //     break;
+                // }
             }
         }
         if (found_knight >= 0) {
@@ -539,6 +543,26 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
             return;
         }
     }
+}
+
+bool
+validate_knight_move(int origin_index, int destination_index)
+{
+    int of = origin_index / 8;
+    int or = origin_index % 8;
+    int df = destination_index / 8;
+    int dr = destination_index % 8;
+
+    return (
+        (of == (df - 2) && or == (dr - 1)) ||
+        (of == (df - 2) && or == (dr + 1)) ||
+        (of == (df - 1) && or == (dr - 2)) ||
+        (of == (df - 1) && or == (dr + 2)) ||
+        (of == (df + 1) && or == (dr - 2)) ||
+        (of == (df + 1) && or == (dr + 2)) ||
+        (of == (df + 2) && or == (dr - 1)) ||
+        (of == (df + 2) && or == (dr + 1))
+    );
 }
 
 int
