@@ -37,6 +37,8 @@ v0.1
     - [x] king moves
     - [x] promotion
     - [x] fix pgn_reader reading all turns
+    - [ ] "trace_clear_line" - add way to specify which type of line
+      - this is to fix issue that rook diag. and bishop straight is correct 
     - [ ] Cleanup C
     - [ ] Cleanup A - assert macro?
 - [!] Strip variations from PGN_Reader

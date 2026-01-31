@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/4examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -215,12 +215,17 @@ handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece
         printf("ERROR PROMOTION: not a pawn moving?\n");
         return;
     }
+    int destination_index = get_index_from_move(destination[0], destination[1]);
+    if (destination_index < 0) {
+        printf("ERROR DESTINATION INDEX: PROMOTION\n");
+        return;
+    }
+
 
     char pawn[2] = {'P', '\0'};
     handle_pawn_move(b, pawn, destination, color);
 
-    int destination_index = get_index_from_move(destination[0], destination[1]);
-    Piece promotion_piece = EMPTY;
+    Piece promotion_piece   = EMPTY;
 
     switch (prom_piece[0]) {
         case 'Q': promotion_piece = (color == PGN_WHITE) ? W_QUEEN  : B_QUEEN;  break;
@@ -290,9 +295,13 @@ handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
 void
 handle_king_move(Piece *b, char *destination, int color)
 {
+    int destination_index = get_index_from_move(destination[0], destination[1]);
+    if (destination_index < 0) {
+        printf("ERROR DESTINATION INDEX: KING MOVE\n");
+        return;
+    }
     Piece active_king = (color == PGN_WHITE) ? W_KING : B_KING;
-    int   destination_index = get_index_from_move(destination[0], destination[1]);
-    int   found_king = -1;
+    int   found_king  = -1;
 
     for (int i = 0; i < 64; i++) {
         if (b[i] == active_king) {
@@ -312,23 +321,21 @@ handle_king_move(Piece *b, char *destination, int color)
 void
 handle_queen_move(Piece *b, char *piece, char *destination, int color)
 {
-    Piece active_queen      = (color == PGN_WHITE) ? W_QUEEN : B_QUEEN;
-    int   destination_index = get_index_from_move(destination[0], destination[1]);
+    int destination_index = get_index_from_move(destination[0], destination[1]);
     if (destination_index < 0) {
         printf("ERROR DESTINATION INDEX: QUEEN MOVE\n");
         return;
     }
+    Piece active_queen = (color == PGN_WHITE) ? W_QUEEN : B_QUEEN;
+    int   found_queen  = -1;
 
     if (piece[2] != '\0') {
         int file_index = char_to_file_or_rank(piece[1]);
         int rank_index = char_to_file_or_rank(piece[2]);
-        b[destination_index]       = active_queen;
-        b[file_index*8+rank_index] = EMPTY;
+        found_queen = file_index * 8 + rank_index;
     } else if (piece[1] != '\0') {
-        int found_queen = -1;
         int file_index = char_to_file_or_rank(piece[1]);
-        file_index *= 8;
-        for (int i = file_index; i < file_index+8; i++) {
+        for (int i = file_index * 8; i < file_index * 8 + 8; i++) {
             if (b[i] == active_queen) {
                 if (trace_clear_line(b, i, destination_index)) {
                     found_queen = i;
@@ -336,14 +343,10 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
                 }
             }
         }
-        if (found_queen >= 0) {
-            b[destination_index] = active_queen;
-            b[found_queen]       = EMPTY;
-        } else {
+        if (found_queen < 0) {
             printf("ERROR: INVALID QUEEN MOVE - file known\n");
         }
     } else {
-        int found_queen = -1;
         for (int i = 0; i < 64; i++) {
             if (b[i] == active_queen) {
                 if (trace_clear_line(b, i, destination_index)) {
@@ -352,15 +355,16 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
                 }
             }
         }
-        if (found_queen >= 0) {
-            b[destination_index] = active_queen;
-            b[found_queen]       = EMPTY;
-        } else {
+        if (found_queen < 0) {
             printf("ERROR: INVALID QUEEN MOVE - normal\n");
         }
     }
-}
 
+    if (found_queen >= 0) {
+        b[destination_index] = active_queen;
+        b[found_queen]       = EMPTY;
+    }
+}
 
 void
 handle_rook_move(Piece *b, char *piece, char *destination, int color)
@@ -371,32 +375,54 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
         return;
     }
     Piece active_rook = (color == PGN_WHITE) ? W_ROOK : B_ROOK;
+    int   found_rook  = -1;
 
     if (piece[2] != '\0') {
-        int piece_file             = char_to_file_or_rank(piece[1]);
-        int piece_rank             = char_to_file_or_rank(piece[2]);
-        b[destination_index]       = active_rook;
-        b[piece_file*8+piece_rank] = EMPTY;
+        int piece_file = char_to_file_or_rank(piece[1]);
+        int piece_rank = char_to_file_or_rank(piece[2]);
+        found_rook     = piece_file * 8 + piece_rank;
     } else if (piece[1] != '\0') {
         int file_index = char_to_file_or_rank(piece[1]);
-        int rank_index = char_to_file_or_rank(destination[1]);
-        int found_rook = hunt_rook(b, file_index, rank_index, active_rook);
-        if (found_rook >= 0) {
-            b[destination_index] = active_rook;
-            b[found_rook]        = EMPTY;
-        } else {
+        for (int i = file_index*8; i < file_index*8+8; i++) {
+            if (b[i] == active_rook) {
+                if (trace_clear_line(b, i, destination_index)) {
+                    found_rook = i;
+                    break;
+                }
+            }
+        }
+        if (found_rook < 0) {
             printf("ERROR: INVALID ROOK MOVE - file known\n");
         }
     } else {
         int file_index = char_to_file_or_rank(destination[0]);
-        int rank_index = char_to_file_or_rank(destination[1]);
-        int found_rook = hunt_rook(b, file_index, rank_index, active_rook);
-        if (found_rook >= 0) {
-            b[destination_index] = active_rook;
-            b[found_rook]        = EMPTY;
-        } else {
+        for (int i = file_index * 8; i < file_index * 8 + 8; i++) {
+            if (b[i] == active_rook) {
+                if (trace_clear_line(b, i, destination_index)) {
+                    found_rook = i;
+                    break;
+                }
+            }
+        }
+        if (found_rook < 0) {
+            int rank_index = char_to_file_or_rank(destination[1]);
+            for (int i = rank_index; i < 64; i += 8) {
+                if (b[i] == active_rook) {
+                    if (trace_clear_line(b, i, destination_index)) {
+                        found_rook = i;
+                        break;
+                    }
+                }
+            }
+        }
+        if (found_rook < 0) {
             printf("ERROR: INVALID ROOK MOVE - normal\n");
         }
+    }
+
+    if (found_rook >= 0) {
+        b[destination_index] = active_rook;
+        b[found_rook]        = EMPTY;
     }
 }
 
@@ -439,22 +465,20 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
         return;
     }
     Piece active_bishop    = (color == PGN_WHITE) ? W_BISHOP : B_BISHOP;
-    int   file_index       = char_to_file_or_rank(destination[0]);
-    int   rank_index       = char_to_file_or_rank(destination[1]);
     int   found_bishop     = -1;
-    bool  dest_dark_square = is_dark_square(file_index, rank_index);
+    bool  dest_dark_square = is_dark_square(destination_index);
 
     if (piece[2] != '\0') {
         int piece_file = char_to_file_or_rank(piece[1]);
         int piece_rank = char_to_file_or_rank(piece[2]);
         found_bishop   = piece_file * 8 + piece_rank;
     } else if (piece[1] != '\0') {
-        int piece_file  = char_to_file_or_rank(piece[1]);
-        for (int i = 0; i < 8; i++) {
-            if (b[piece_file*8+i] == active_bishop) {
-                if (is_dark_square(piece_file, i) == dest_dark_square) {
-                    if (trace_clear_line(b, piece_file*8+i, destination_index)) {
-                        found_bishop = piece_file * 8 + i;
+        int file_index = char_to_file_or_rank(piece[1]);
+        for (int i = file_index * 8; i < file_index * 8 + 8; i++) {
+            if (b[i] == active_bishop) {
+                if (is_dark_square(i) == dest_dark_square) {
+                    if (trace_clear_line(b, i, destination_index)) {
+                        found_bishop = i;
                         break;
                     }
                 }
@@ -465,18 +489,15 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
             return;
         }
     } else {
-        for (int f = 0; f < 8; f++) {
-            for (int r = 0; r < 8; r++) {
-                if (b[f*8+r] == active_bishop) {
-                    if (is_dark_square(f,r) == dest_dark_square) {
-                        if (trace_clear_line(b, f*8+r, destination_index)) {
-                            found_bishop = f * 8 + r;
-                            break;
-                        }
+        for (int i = 0; i < 64; i++) {
+            if (b[i] == active_bishop) {
+                if (is_dark_square(i) == dest_dark_square) {
+                    if (trace_clear_line(b, i, destination_index)) {
+                        found_bishop = i;
+                        break;
                     }
                 }
             }
-            if (found_bishop >= 0) break;
         }
         if (found_bishop < 0) {
             printf("ERROR: INVALID BISHOP MOVE - normal\n");
@@ -502,12 +523,12 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
     int   found_knight  = -1;
 
     if (piece[2] != '\0') {
-        int file_index             = char_to_file_or_rank(piece[1]);
-        int rank_index             = char_to_file_or_rank(piece[2]);
-        found_knight               = file_index * 8 + rank_index;
+        int file_index = char_to_file_or_rank(piece[1]);
+        int rank_index = char_to_file_or_rank(piece[2]);
+        found_knight   = file_index * 8 + rank_index;
     } else if (piece[1] != '\0') {
-        int file_index   = char_to_file_or_rank(piece[1]);
-        for (int i = file_index*8; i < file_index*8+8; i++) {
+        int file_index = char_to_file_or_rank(piece[1]);
+        for (int i = file_index * 8; i < file_index * 8 + 8; i++) {
             if (b[i] == active_knight) {
                 if (validate_knight_move(i, destination_index)) {
                     found_knight = i;
@@ -520,8 +541,14 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
             return;
         }
     } else {
-        //we need to find the knight based on destination square
-        found_knight = hunt_knight(b, destination_index, active_knight);
+        for (int i = 0; i < 64; i++) {
+            if (b[i] == active_knight) {
+                if (validate_knight_move(i, destination_index)) {
+                    found_knight = i;
+                    break;
+                }
+            }
+        }
         if (found_knight < 0) {
             printf("ERROR: INVALID KNIGHT MOVE? - knight hunt\n");
             return;
@@ -537,20 +564,19 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
 bool
 validate_knight_move(int origin_index, int destination_index)
 {
-    int of = origin_index / 8;
-    int or = origin_index % 8;
-    int df = destination_index / 8;
-    int dr = destination_index % 8;
-
+    int o_f = origin_index / 8;
+    int o_r = origin_index % 8;
+    int d_f = destination_index / 8;
+    int d_r = destination_index % 8;
     return (
-        (of == (df - 2) && or == (dr - 1)) ||
-        (of == (df - 2) && or == (dr + 1)) ||
-        (of == (df - 1) && or == (dr - 2)) ||
-        (of == (df - 1) && or == (dr + 2)) ||
-        (of == (df + 1) && or == (dr - 2)) ||
-        (of == (df + 1) && or == (dr + 2)) ||
-        (of == (df + 2) && or == (dr - 1)) ||
-        (of == (df + 2) && or == (dr + 1))
+        (o_f == (d_f - 2) && o_r == (d_r - 1)) ||
+        (o_f == (d_f - 2) && o_r == (d_r + 1)) ||
+        (o_f == (d_f - 1) && o_r == (d_r - 2)) ||
+        (o_f == (d_f - 1) && o_r == (d_r + 2)) ||
+        (o_f == (d_f + 1) && o_r == (d_r - 2)) ||
+        (o_f == (d_f + 1) && o_r == (d_r + 2)) ||
+        (o_f == (d_f + 2) && o_r == (d_r - 1)) ||
+        (o_f == (d_f + 2) && o_r == (d_r + 1))
     );
 }
 
@@ -605,26 +631,24 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         return;
     }
 
-    int   sign              = (color == PGN_WHITE) ? -1 : 1;
-    Piece active_pawn       = (color == PGN_WHITE) ? W_PAWN : B_PAWN;
-    int   moving_pawn       = -1;
+    Piece active_pawn = (color == PGN_WHITE) ? W_PAWN : B_PAWN;
+    int   sign        = (color == PGN_WHITE) ? -1 : 1;
+    int   found_pawn  = -1;
     //Normal pawn move (no file or rank disambiguation)
     if (piece[1] == '\0') {
-        int i                 = destination_index;
-
-        if (b[i+sign*2] == active_pawn) {moving_pawn = i + sign*2;}
-        if (b[i+sign]   == active_pawn) {moving_pawn = i + sign;}
-        if (moving_pawn < 0) {
+        int i = destination_index;
+        if (b[i+sign*2] == active_pawn) {found_pawn = i + sign*2;}
+        if (b[i+sign]   == active_pawn) {found_pawn = i + sign;}
+        if (found_pawn < 0) {
             printf("ERROR: INVALID PAWN MOVE? - normal\n");
             return;
         }
     } else {
         if (b[destination_index] != EMPTY) {
             //capture
-            int p  = get_index_from_move(piece[1], destination[1]);
-            p     += sign;
-            if (b[p] == active_pawn) {
-                moving_pawn = p;
+            int p = get_index_from_move(piece[1], destination[1]);
+            if (b[p + sign] == active_pawn) {
+                found_pawn = p + sign;
             } else {
                 printf("ERROR: INVALID PAWN MOVE? = capture\n");
                 return;
@@ -632,8 +656,8 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         } else {
             //en-passant
             Piece passing_pawn = (active_pawn == W_PAWN) ? B_PAWN : W_PAWN;
-            if (b[destination_index-sign] == passing_pawn) {
-                moving_pawn = destination_index-sign;
+            if (b[destination_index - sign] == passing_pawn) {
+                found_pawn = destination_index - sign;
             } else {
                 printf("ERROR: INVALID PAWN MOVE? - en passant\n");
                 return;
@@ -641,9 +665,9 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         }
     }
 
-    if (moving_pawn >= 0) {
+    if (found_pawn >= 0) {
         b[destination_index] = active_pawn;
-        b[moving_pawn]       = EMPTY;
+        b[found_pawn]        = EMPTY;
     }
 }
 
@@ -660,7 +684,7 @@ trace_clear_line(Piece *b, int origin_index, int destination_index)
     int sign_r      = ((v_r == 0) ? 0 : v_r/ABS_I(v_r));
 
     while (origin_index != destination_index) {
-        origin_index += 8*sign_f;
+        origin_index += 8 * sign_f;
         origin_index += sign_r;
         if (origin_index == destination_index)      return true;
         if (origin_index < 0 || origin_index >= 64) return false;
@@ -670,8 +694,10 @@ trace_clear_line(Piece *b, int origin_index, int destination_index)
 }
 
 bool
-is_dark_square(int file, int rank)
+is_dark_square(int index)
 {
+    int file = index / 8;
+    int rank = index % 8;
     return ((file + rank) % 2 == 0);
 }
 

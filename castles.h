@@ -57,7 +57,7 @@ void input_turn_on_board(Piece* b, PGN_Turn t, int color);
 
 int  char_to_file_or_rank(char c);
 int  get_index_from_move(char file, char rank);
-bool is_dark_square(int file, int rank);
+bool is_dark_square(int index);
 bool trace_clear_line(Piece *b, int origin_index, int destination_index);
 
 void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
