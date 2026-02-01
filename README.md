@@ -37,9 +37,9 @@ v0.1
     - [x] king moves
     - [x] promotion
     - [x] fix pgn_reader reading all turns
-    - [ ] "trace_clear_line" - add way to specify which type of line
-      - this is to fix issue that rook diag. and bishop straight is correct 
-    - [ ] Cleanup C
+    - [~] "trace_clear_line" - add way to specify which type of line
+    - [~] Cleanup C
+    - [ ] Helpers for similar functions across all pieces
     - [ ] Cleanup A - assert macro?
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
@@ -48,13 +48,17 @@ v0.1
 - [ ] Game effects
 - [ ] On-screen text box to paste pgn data
 - [ ] Better PGN error handling
+- [ ] Return error codes and stop input
 
 ~~~~~~~~
 
 ### CLEANUP
 A: assert/validate return values from functions finding indexes into the array throughout:
     - get_index_from_move, char_to_file_or_rank
-B: For Bishop, Queen, Pawn, make sure the closest found piece is moving (look at hunt_rook for how this is done?)
 C: Can we simplify the hunting moves? (all pieces)
 D: manually create a PGN which tests edge-cases?:
-    - en-passant, different levels of disambiguation, queenside castle, capturepromotion, bishops/queens on same diagonal
+    - en-passant, different levels of disambiguation
+    - queenside castle
+    - capturepromotion
+    - bishops/queens on same diagonal
+    - trace_clear_line() with diagonal rook or straight bishop with a clear line

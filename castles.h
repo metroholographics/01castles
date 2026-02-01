@@ -8,7 +8,6 @@
 #define CLAMP_I(x,min,max) ((int)(((x) < (min)) ? (min) : ((x) > (max)) ? (max) : (x)))
 #define ABS_I(x)           ((int)((x) < 0 ? (-x) : (x)))
 
-
 #define CLEAR_COLOR  (SDL_Color) {145, 163, 170, 255}
 #define LIGHT_SQUARE (SDL_Color) {145, 163, 170, 255}
 #define DARK_SQUARE  (SDL_Color) {76, 86, 113, 255}
@@ -29,6 +28,12 @@ typedef enum {
 typedef enum {
     A, B, C, D, E, F, G, H
 } RANK;
+
+typedef enum {
+    ANY,
+    STRAIGHT,
+    DIAGONAL
+} LineType;
 
 typedef struct {
     Piece game_turns[PGN_MAX_TURNS*2][8*8];
@@ -58,7 +63,7 @@ void input_turn_on_board(Piece* b, PGN_Turn t, int color);
 int  char_to_file_or_rank(char c);
 int  get_index_from_move(char file, char rank);
 bool is_dark_square(int index);
-bool trace_clear_line(Piece *b, int origin_index, int destination_index);
+bool trace_clear_line(Piece *b, int origin_index, int destination_index, LineType line);
 
 void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
 void handle_knight_move(Piece *b, char *piece, char *destination, int color);

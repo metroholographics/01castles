@@ -228,11 +228,10 @@ handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece
         return;
     }
 
-
     char pawn[2] = {'P', '\0'};
     handle_pawn_move(b, pawn, destination, color);
 
-    Piece promotion_piece   = EMPTY;
+    Piece promotion_piece = EMPTY;
 
     switch (prom_piece[0]) {
         case 'Q': promotion_piece = (color == PGN_WHITE) ? W_QUEEN  : B_QUEEN;  break;
@@ -344,7 +343,7 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
         int file_index = char_to_file_or_rank(piece[1]);
         for (int i = file_index * 8; i < file_index * 8 + 8; i++) {
             if (b[i] == active_queen) {
-                if (trace_clear_line(b, i, destination_index)) {
+                if (trace_clear_line(b, i, destination_index, ANY)) {
                     found_queen = i;
                     break;
                 }
@@ -356,7 +355,7 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
     } else {
         for (int i = 0; i < 64; i++) {
             if (b[i] == active_queen) {
-                if (trace_clear_line(b, i, destination_index)) {
+                if (trace_clear_line(b, i, destination_index, ANY)) {
                     found_queen = i;
                     break;
                 }
@@ -390,9 +389,9 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
         found_rook     = piece_file * 8 + piece_rank;
     } else if (piece[1] != '\0') {
         int file_index = char_to_file_or_rank(piece[1]);
-        for (int i = file_index*8; i < file_index*8+8; i++) {
+        for (int i = file_index * 8; i < file_index * 8 + 8; i++) {
             if (b[i] == active_rook) {
-                if (trace_clear_line(b, i, destination_index)) {
+                if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
                     found_rook = i;
                     break;
                 }
@@ -405,7 +404,7 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
         int file_index = char_to_file_or_rank(destination[0]);
         for (int i = file_index * 8; i < file_index * 8 + 8; i++) {
             if (b[i] == active_rook) {
-                if (trace_clear_line(b, i, destination_index)) {
+                if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
                     found_rook = i;
                     break;
                 }
@@ -415,7 +414,7 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
             int rank_index = char_to_file_or_rank(destination[1]);
             for (int i = rank_index; i < 64; i += 8) {
                 if (b[i] == active_rook) {
-                    if (trace_clear_line(b, i, destination_index)) {
+                    if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
                         found_rook = i;
                         break;
                     }
@@ -484,7 +483,7 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
         for (int i = file_index * 8; i < file_index * 8 + 8; i++) {
             if (b[i] == active_bishop) {
                 if (is_dark_square(i) == dest_dark_square) {
-                    if (trace_clear_line(b, i, destination_index)) {
+                    if (trace_clear_line(b, i, destination_index, DIAGONAL)) {
                         found_bishop = i;
                         break;
                     }
@@ -499,7 +498,7 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
         for (int i = 0; i < 64; i++) {
             if (b[i] == active_bishop) {
                 if (is_dark_square(i) == dest_dark_square) {
-                    if (trace_clear_line(b, i, destination_index)) {
+                    if (trace_clear_line(b, i, destination_index, DIAGONAL)) {
                         found_bishop = i;
                         break;
                     }
@@ -644,7 +643,7 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
     //Normal pawn move (no file or rank disambiguation)
     if (piece[1] == '\0') {
         int i = destination_index;
-        if (b[i+sign*2] == active_pawn) {found_pawn = i + sign*2;}
+        if (b[i+sign*2] == active_pawn) {found_pawn = i + sign * 2;}
         if (b[i+sign]   == active_pawn) {found_pawn = i + sign;}
         if (found_pawn < 0) {
             printf("ERROR: INVALID PAWN MOVE? - normal\n");
@@ -654,7 +653,7 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         if (b[destination_index] != EMPTY) {
             //capture
             int p = get_index_from_move(piece[1], destination[1]);
-            if (b[p + sign] == active_pawn) {
+            if (b[p+sign] == active_pawn) {
                 found_pawn = p + sign;
             } else {
                 printf("ERROR: INVALID PAWN MOVE? = capture\n");
@@ -663,7 +662,7 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         } else {
             //en-passant
             Piece passing_pawn = (active_pawn == W_PAWN) ? B_PAWN : W_PAWN;
-            if (b[destination_index - sign] == passing_pawn) {
+            if (b[destination_index-sign] == passing_pawn) {
                 found_pawn = destination_index - sign;
             } else {
                 printf("ERROR: INVALID PAWN MOVE? - en passant\n");
@@ -679,7 +678,7 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
 }
 
 bool
-trace_clear_line(Piece *b, int origin_index, int destination_index)
+trace_clear_line(Piece *b, int origin_index, int destination_index, LineType line)
 {
     int orig_file   = origin_index / 8;
     int orig_rank   = origin_index % 8;
@@ -689,6 +688,12 @@ trace_clear_line(Piece *b, int origin_index, int destination_index)
     int v_r         = dest_rank - orig_rank;
     int sign_f      = ((v_f == 0) ? 0 : v_f/ABS_I(v_f));
     int sign_r      = ((v_r == 0) ? 0 : v_r/ABS_I(v_r));
+
+    if (line == STRAIGHT) {
+        if (sign_f != 0 && sign_r != 0) return false;
+    } else if (line == DIAGONAL) {
+        if (sign_f == 0 || sign_r == 0) return false;
+    }
 
     while (origin_index != destination_index) {
         origin_index += 8 * sign_f;
