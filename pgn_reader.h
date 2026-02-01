@@ -11,6 +11,7 @@
 #define PGN_ROOK_OFFSET 2
 
 typedef enum {
+    PGN_ERR_POP_TURN  = -7,
     PGN_ERR_SCANLINE  = -6,
     PGN_ERR_ENDGAME   = -5,
     PGN_ERR_PARSE_MTX = -4,
@@ -42,7 +43,7 @@ PGN_Error parse_movetext(PGN_Game *g, FILE *f);
 PGN_Error pgn_read_turn(PGN_Turn *t, FILE *f);
 bool file_check_nextc(FILE *f, char c);
 int pgn_read_move(char* buff, int buff_max, FILE *f);
-void pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index);
+PGN_Error pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index);
 bool pgn_is_piece(char c);
 bool pgn_is_rank(char c);
 bool pgn_piece_or_rank(char c);

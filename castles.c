@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/5examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -228,8 +228,8 @@ handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece
         return;
     }
 
-    char pawn[2] = {'P', '\0'};
-    handle_pawn_move(b, pawn, destination, color);
+    //char pawn[2] = {'P', '\0'};
+    handle_pawn_move(b, piece[color], destination, color);
 
     Piece promotion_piece = EMPTY;
 
@@ -642,28 +642,43 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
     int   found_pawn  = -1;
     //Normal pawn move (no file or rank disambiguation)
     if (piece[1] == '\0') {
-        int i = destination_index;
-        if (b[i+sign*2] == active_pawn) {found_pawn = i + sign * 2;}
-        if (b[i+sign]   == active_pawn) {found_pawn = i + sign;}
+        // int i = destination_index;
+        int file = destination_index / 8;
+        for (int i = file*8; i < file * 8 + 8; i++) {
+            if (b[i] == active_pawn) {
+                if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
+                    found_pawn = i;
+                    break;
+                }
+            }
+        }
         if (found_pawn < 0) {
             printf("ERROR: INVALID PAWN MOVE? - normal\n");
             return;
         }
     } else {
+        int file = char_to_file_or_rank(piece[1]);
+        for (int i = file * 8; i < file * 8 + 8; i++) {
+            if (b[i] == active_pawn) {
+                if (trace_clear_line(b, i , destination_index, DIAGONAL)) {
+                    found_pawn = i;
+                    break;
+                }
+            }
+        }
+        //int p = get_index_from_move(piece[1], destination[1]);
+        if (found_pawn < 0) {
+            printf("ERROR: INVALID PAWN MOVE? = capture\n");
+            return;
+        }
+
         if (b[destination_index] != EMPTY) {
             //capture
-            int p = get_index_from_move(piece[1], destination[1]);
-            if (b[p+sign] == active_pawn) {
-                found_pawn = p + sign;
-            } else {
-                printf("ERROR: INVALID PAWN MOVE? = capture\n");
-                return;
-            }
         } else {
             //en-passant
             Piece passing_pawn = (active_pawn == W_PAWN) ? B_PAWN : W_PAWN;
-            if (b[destination_index-sign] == passing_pawn) {
-                found_pawn = destination_index - sign;
+            if (b[destination_index+sign] == passing_pawn) {
+                b[destination_index + sign] = EMPTY;
             } else {
                 printf("ERROR: INVALID PAWN MOVE? - en passant\n");
                 return;

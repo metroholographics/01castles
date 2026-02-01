@@ -37,8 +37,10 @@ v0.1
     - [x] king moves
     - [x] promotion
     - [x] fix pgn_reader reading all turns
-    - [~] "trace_clear_line" - add way to specify which type of line
-    - [~] Cleanup C
+    - [x] "trace_clear_line" - add way to specify which type of line
+    - [~] Fix pawn move/promotion
+    - [ ] Add rank disambiguation if not a file
+    - [ ] Check for king pins when moving piece?
     - [ ] Helpers for similar functions across all pieces
     - [ ] Cleanup A - assert macro?
 - [!] Strip variations from PGN_Reader

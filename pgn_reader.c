@@ -68,7 +68,7 @@ parse_movetext(PGN_Game *g, FILE *f)
     return PGN_SUCCESS;
 }
 
-void
+PGN_Error
 pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
 {
     t->castle[color_index] = false;
@@ -78,6 +78,7 @@ pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
     while (!pgn_piece_or_rank(buffer[start])) {
         start++;
         len--;
+        if (start >= len) return PGN_ERR_POP_TURN;
     }
 
     char c = buffer[end-1];
@@ -114,7 +115,7 @@ pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
         //promotion
         t->promotion[color_index] = true;
         t->piece[color_index][0] = 'P';
-        t->piece[color_index][1] = buffer[0];
+        t->piece[color_index][1] = (buffer[1] == 'x') ? buffer[0] : '\0';
         t->piece[color_index][2] = '\0';
         t->move_to[color_index][0] = buffer[end-4];
         t->move_to[color_index][1] = buffer[end-3];
@@ -168,6 +169,7 @@ pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
     if (t->promotion[color_index]) {
         printf("\t %s promotes to %s\n", t->piece[color_index], t->promotion_piece[color_index]);
     }
+    return PGN_SUCCESS;
 }
 
 PGN_Error
@@ -213,8 +215,11 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         if (white_len <= 0) {
             return PGN_ERR_ENDGAME;
         } else {
-            pgn_populate_game_turn(t, white_move_buffer, white_len, PGN_WHITE);
-            t->white_move = true;
+            if (pgn_populate_game_turn(t, white_move_buffer, white_len, PGN_WHITE) < 0) {
+                return PGN_ERR_ENDGAME;
+            } else {
+                t->white_move = true;
+            }
         }
     }
     // for (int i = 0; i < white_len; i++) {
@@ -235,8 +240,11 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
     if (black_len <= 0) {
         return PGN_ERR_ENDGAME;
     } else {
-        pgn_populate_game_turn(t, black_move_buffer, black_len, PGN_BLACK);
-        t->black_move = true;
+        if (pgn_populate_game_turn(t, black_move_buffer, black_len, PGN_BLACK) < 0) {
+            return PGN_ERR_ENDGAME;
+        } else {
+            t->black_move = true;
+        }
     }
 
     if (file_check_nextc(f, '$')) {
@@ -279,7 +287,7 @@ pgn_read_move(char* buff, int buff_max, FILE* f)
             return len;
         }
         if (c == EOF) {
-            return -1;
+            return len;
         }
         if (c == '{') {
             while ((c = getc(f)) != '}');
@@ -327,6 +335,7 @@ PGN_Error
 strip_tag_pairs(FILE *f)
 {
     fpos_t indicator;
+    fgetpos(f, &indicator);
     char c1 = '\0';
 
     while ((c1 = getc(f)) != EOF) {
