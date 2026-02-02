@@ -60,6 +60,9 @@ void store_game_in_boards(TurnHistory *th, PGN_Game p);
 void copy_board(Piece *target, Piece *source);
 void input_turn_on_board(Piece* b, PGN_Turn t, int color);
 
+
+bool is_file(char c);
+bool is_rank(char c);
 int  char_to_file_or_rank(char c);
 int  get_index_from_move(char file, char rank);
 bool is_dark_square(int index);
