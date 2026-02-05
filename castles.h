@@ -67,14 +67,13 @@ int  char_to_file_or_rank(char c);
 int  get_index_from_move(char file, char rank);
 bool is_dark_square(int index);
 bool trace_clear_line(Piece *b, int origin_index, int destination_index, LineType line);
+bool not_pinned(Piece *b, int piece_index, int dest_index, int color);
 
 void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
 void handle_knight_move(Piece *b, char *piece, char *destination, int color);
-int  hunt_knight(Piece *b, int destination_index, Piece knight);
 bool validate_knight_move(int origin_index, int destination_index);
 void handle_bishop_move(Piece *b, char *piece, char *destination, int color);
 void handle_rook_move(Piece *b, char *piece, char *destination, int color);
-int  hunt_rook(Piece *b, int file_index, int rank_index, Piece rook);
 void handle_queen_move(Piece *b, char *piece, char *destination, int color);
 void handle_king_move(Piece *b, char *destination, int color);
 void handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color);

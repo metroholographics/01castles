@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/5examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/6examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -338,7 +338,7 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
         int index       = char_to_file_or_rank(piece[1]);
         if (file_known) {
             for (int i = index * 8; i < index * 8 + 8; i++) {
-                if (b[i] == active_queen) {
+                if (b[i] == active_queen && not_pinned(b, i, destination_index, color)) {
                     if (trace_clear_line(b, i, destination_index, ANY)) {
                         found_queen = i;
                         break;
@@ -347,7 +347,7 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
             }
         } else if (rank_known) {
             for (int i = index; i < 64; i += 8) {
-                if (b[i] == active_queen) {
+                if (b[i] == active_queen && not_pinned(b, i, destination_index, color)) {
                     if (trace_clear_line(b, i, destination_index, ANY)) {
                         found_queen = i;
                         break;
@@ -360,7 +360,7 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
         }
     } else {
         for (int i = 0; i < 64; i++) {
-            if (b[i] == active_queen) {
+            if (b[i] == active_queen && not_pinned(b, i, destination_index, color)) {
                 if (trace_clear_line(b, i, destination_index, ANY)) {
                     found_queen = i;
                     break;
@@ -399,7 +399,7 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
         int index       = char_to_file_or_rank(piece[1]);
         if (file_known) {
             for (int i = index * 8; i < index * 8 + 8; i++) {
-                if (b[i] == active_rook) {
+                if (b[i] == active_rook && not_pinned(b, i, destination_index, color)) {
                     if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
                         found_rook = i;
                         break;
@@ -408,7 +408,7 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
             }
         } else if (rank_known) {
             for (int i = index; i < 64; i += 8) {
-                if (b[i] == active_rook) {
+                if (b[i] == active_rook && not_pinned(b, i, destination_index, color)) {
                     if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
                         found_rook = i;
                         break;
@@ -421,7 +421,7 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
         }
     } else {
         for (int i = 0; i < 64; i++) {
-            if (b[i] == active_rook) {
+            if (b[i] == active_rook && not_pinned(b, i, destination_index, color)) {
                 if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
                     found_rook = i;
                     break;
@@ -462,7 +462,7 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
         if (file_known) {
             for (int i = index * 8; i < index * 8 + 8; i++) {
                 if (b[i] == active_bishop) {
-                    if (is_dark_square(i) == dest_dark_square) {
+                    if (is_dark_square(i) == dest_dark_square && not_pinned(b, i, destination_index, color)) {
                         if (trace_clear_line(b, i, destination_index, DIAGONAL)) {
                             found_bishop = i;
                             break;
@@ -473,7 +473,7 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
         } else if (rank_known) {
             for (int i = index; i < 64; i += 8) {
                 if (b[i] == active_bishop) {
-                    if (is_dark_square(i) == dest_dark_square) {
+                    if (is_dark_square(i) == dest_dark_square && not_pinned(b, i, destination_index, color)) {
                         if (trace_clear_line(b, i, destination_index, DIAGONAL)) {
                             found_bishop = i;
                             break;
@@ -489,7 +489,7 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
     } else {
         for (int i = 0; i < 64; i++) {
             if (b[i] == active_bishop) {
-                if (is_dark_square(i) == dest_dark_square) {
+                if (is_dark_square(i) == dest_dark_square && not_pinned(b, i, destination_index, color)) {
                     if (trace_clear_line(b, i, destination_index, DIAGONAL)) {
                         found_bishop = i;
                         break;
@@ -508,6 +508,72 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
         b[found_bishop]      = EMPTY;
     }
 }
+
+
+bool
+not_pinned(Piece *b, int piece_index, int dest_index, int color)
+{
+    // return true if piece is not pinned
+    // piece is pinned if it has an uninterrupted diagonal or straight ('Dir') to it's king
+    // && an uninterrupted 'Dir' to Rook or Queen (Dir==straight) or Bishop, Queen if (Dir==diag.)
+
+    Piece king       = (color == PGN_WHITE) ? W_KING : B_KING;
+    int   found_king = -1;
+    for (int i = 0; i < 64; i++) {
+        if (b[i] == king) {
+            found_king = i;
+        }
+    }
+    if (found_king < 0) {
+        printf("ERROR: can't find king in not_pinned()\n");
+        return false;
+    }
+
+    int p_o_f = piece_index / 8;
+    int p_o_r = piece_index % 8;
+    int k_o_f = found_king / 8;
+    int k_o_r = found_king % 8;
+    int v_f    = k_o_f - p_o_f;
+    int v_r    = k_o_r - p_o_r;
+    int sign_f = -((v_f == 0) ? 0 : v_f/ABS_I(v_f));
+    int sign_r = -((v_r == 0) ? 0 : v_r/ABS_I(v_r));
+
+    if (trace_clear_line(b, piece_index, found_king, STRAIGHT)) {
+        Piece opp_rook  = (color == PGN_WHITE) ? B_ROOK : W_ROOK;
+        Piece opp_queen = (color == PGN_WHITE) ? B_QUEEN : W_QUEEN;
+        while (piece_index >= 0 && piece_index < 64) {
+            piece_index += 8 * sign_f;
+            piece_index += sign_r;
+            if (piece_index == dest_index) return true;
+            Piece p = b[piece_index];
+            if (p != EMPTY) {
+                if (p == opp_rook || p == opp_queen) {
+                    return trace_clear_line(b, found_king, dest_index, STRAIGHT);
+                }
+                else return true;
+            }
+        }
+    }
+    if (trace_clear_line(b, piece_index, found_king, DIAGONAL)) {
+        Piece opp_bishop = (color == PGN_WHITE) ? B_BISHOP : W_BISHOP;
+        Piece opp_queen  = (color == PGN_WHITE) ? B_QUEEN : W_QUEEN;
+        while (piece_index >= 0 && piece_index < 64) {
+            piece_index += 8 * sign_f;
+            piece_index += sign_r;
+            if (piece_index == dest_index) return true;
+            Piece p = b[piece_index];
+            if (p != EMPTY) {
+                if (p == opp_bishop || p == opp_queen) {
+                    return trace_clear_line(b, found_king, dest_index, DIAGONAL);
+                }
+                else return true;
+            }
+        }
+    }
+
+    return true;
+}
+
 
 void
 handle_knight_move(Piece *b, char *piece, char *destination, int color)
@@ -530,7 +596,7 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
         int index       = char_to_file_or_rank(piece[1]);
         if (file_known) {
             for (int i = index * 8; i < index * 8 + 8; i++) {
-                if (b[i] == active_knight) {
+                if (b[i] == active_knight && not_pinned(b, i, destination_index, color)) {
                     if (validate_knight_move(i, destination_index)) {
                         found_knight = i;
                         break;
@@ -539,7 +605,7 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
             }
         } else if (rank_known) {
             for (int i = index; i < 64; i += 8) {
-                if (b[i] == active_knight) {
+                if (b[i] == active_knight && not_pinned(b, i, destination_index, color)) {
                     if (validate_knight_move(i, destination_index)) {
                         found_knight = i;
                         break;
@@ -553,7 +619,7 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
         }
     } else {
         for (int i = 0; i < 64; i++) {
-            if (b[i] == active_knight) {
+            if (b[i] == active_knight && not_pinned(b, i, destination_index, color)) {
                 if (validate_knight_move(i, destination_index)) {
                     found_knight = i;
                     break;
@@ -609,6 +675,7 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         for (int i = file * 8; i < file * 8 + 8; i++) {
             if (b[i] == active_pawn) {
                 if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
+
                     found_pawn = i;
                     break;
                 }
@@ -643,6 +710,7 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
                 b[destination_index + sign] = EMPTY;
             } else {
                 printf("ERROR: INVALID PAWN MOVE? - en passant\n");
+
                 return;
             }
         }
