@@ -548,7 +548,15 @@ not_pinned(Piece *b, int piece_index, int dest_index, int color)
             Piece p = b[piece_index];
             if (p != EMPTY) {
                 if (p == opp_rook || p == opp_queen) {
-                    return trace_clear_line(b, found_king, dest_index, STRAIGHT);
+                    bool same_file = (piece_index / 8) == k_o_f;
+                    bool same_rank = (piece_index % 8) == k_o_r;
+                    if (same_file && (dest_index / 8 != k_o_f)) {
+                        return false;
+                    } else if (same_rank && (dest_index % 8 != k_o_r)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
                 else return true;
             }
@@ -593,7 +601,7 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
     } else if (piece[1] != '\0') {
         bool file_known = is_file(piece[1]);
         bool rank_known = is_rank(piece[1]);
-        int index       = char_to_file_or_rank(piece[1]);
+        int  index      = char_to_file_or_rank(piece[1]);
         if (file_known) {
             for (int i = index * 8; i < index * 8 + 8; i++) {
                 if (b[i] == active_knight && not_pinned(b, i, destination_index, color)) {
