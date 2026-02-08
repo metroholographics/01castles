@@ -572,7 +572,11 @@ not_pinned(Piece *b, int piece_index, int dest_index, int color)
             Piece p = b[piece_index];
             if (p != EMPTY) {
                 if (p == opp_bishop || p == opp_queen) {
-                    return trace_clear_line(b, found_king, dest_index, DIAGONAL);
+                    int d_f    = k_o_f - (dest_index / 8);
+                    int d_r    = k_o_r - (dest_index % 8);
+                    int d_sign_f = -((d_f == 0) ? 0 : d_f/ABS_I(d_f));
+                    int d_sign_r = -((d_r == 0) ? 0 : d_r/ABS_I(d_r));
+                    return ((d_sign_f == sign_f) && (d_sign_r == sign_r));
                 }
                 else return true;
             }
