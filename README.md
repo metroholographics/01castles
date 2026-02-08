@@ -40,8 +40,8 @@ v0.1
     - [x] "trace_clear_line" - add way to specify which type of line
     - [x] Fix pawn move/promotion
     - [x] Add rank disambiguation if not a file
-    - [~] Check for king pins when moving piece
-    - [ ] Helpers for similar functions across all pieces
+    - [x] Check for king pins when moving piece
+    - [~] Helpers for similar functions across all pieces
     - [ ] Cleanup A - assert macro?
 - [ ] Mass PGN tester
     - [ ] read lots of PGNs in a go, stop on errors?

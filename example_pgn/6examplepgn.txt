@@ -2,5 +2,5 @@
 [1. d4 e6 2. Bd2 Bb4 3. Bxb4]
 [1. d4 c6 2. e3 e6 3. Be2 f6 4. Nf3 g6 5. O-O Kf7 6. Qd3 Ke8 7. Bd2 Kf7 8. Nc3 Ke8 9. Rfb1 Kf7 10. b4 Ke8 11. b5 Kf7 12. b6 Ke8 13. bxa7 Ke7 14. Rb6 Ke8 15. Rab1 Rxa7 16. Kh1 Rxa2 17. Kg1 Ra1 18. Rf1]
 [1. d4 c6 2. e3 e6 3. Be2 f6 4. Nf3 g6 5. O-O Kf7 6. Qd3 Ke8 7. Bd2 Kf7 8. Nc3 Ke8 9. Rfb1 Kf7 10. b4 Ke8 11. b5 Kf7 12. b6 Ke8 13. bxa7 Ke7 14. Rb6 Ke8 15. Rab1 Rxa7 16. Kh1 Rxa2 17. Kg1 Ra1 18. Bc1 Rxb1 19. Bb2]
-[1. e4 e5 2. d4 Bb4+ 3. Bd2 Kf8 4. Bc3 Ke8 5. dxe5 Kf8 6. e6 Ke8 7. exf7+ Ke7 8. fxg8=Q a6 9. Qc4 Ke8 10. Qd2 Kf8 11. Be5 Ke8 12. f4 Kf8 13. Qe2 Kf7 14. Qf2]
-1. e4 e5 2. d4 Bb4+ 3. Qd2 Nf6 4. Qc3 Ng4 5. Qd2 Nf6 6. Qc3
+[1. e4 e5 2. d4 Bb4+ 3. Qd2 Nf6 4. Qc3 Ng4 5. Qd2 Nf6 6. Qc3]
+1. e4 e5 2. d4 Bb4+ 3. Bd2 Kf8 4. Bc3 Ke8 5. dxe5 Kf8 6. e6 Ke8 7. exf7+ Ke7 8. fxg8=Q a6 9. Qgd5 Ke8 10. f4 Kf8 11. f5 Ke8 12. f6 Kf8 13. Qf5 Ke8 14. Qd2 Kf8 15. Bd4 Kf7 16. Qf2 Nc6 17. Kd1 Ne5 18. Ke1 Ng6 19. h3 Nf4 20. Qxf4

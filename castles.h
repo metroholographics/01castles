@@ -32,8 +32,13 @@ typedef enum {
 typedef enum {
     ANY,
     STRAIGHT,
-    DIAGONAL
+    DIAGONAL,
 } LineType;
+
+typedef struct {
+    int f_step;
+    int r_step;
+} PathVec;
 
 typedef struct {
     Piece game_turns[PGN_MAX_TURNS*2][8*8];
@@ -61,13 +66,15 @@ void copy_board(Piece *target, Piece *source);
 void input_turn_on_board(Piece* b, PGN_Turn t, int color);
 
 
-bool is_file(char c);
-bool is_rank(char c);
-int  char_to_file_or_rank(char c);
-int  get_index_from_move(char file, char rank);
-bool is_dark_square(int index);
-bool trace_clear_line(Piece *b, int origin_index, int destination_index, LineType line);
-bool not_pinned(Piece *b, int piece_index, int dest_index, int color);
+bool    is_file(char c);
+bool    is_rank(char c);
+int     char_to_file_or_rank(char c);
+int     get_index_from_square(char file, char rank);
+bool    is_dark_square(int index);
+bool    trace_clear_line(Piece *b, int origin_index, int destination_index, LineType line);
+bool    not_pinned(Piece *b, int piece_index, int dest_index, int color);
+PathVec get_path_vector(int from_index, int to_index);
+void    move_piece(Piece *b, int from_index, int dest_index);
 
 void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
 void handle_knight_move(Piece *b, char *piece, char *destination, int color);
