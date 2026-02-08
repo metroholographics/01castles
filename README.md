@@ -41,7 +41,7 @@ v0.1
     - [x] Fix pawn move/promotion
     - [x] Add rank disambiguation if not a file
     - [x] Check for king pins when moving piece
-    - [~] Helpers for similar functions across all pieces
+    - [x] Helpers for similar functions across all pieces
     - [ ] Cleanup A - assert macro?
 - [ ] Mass PGN tester
     - [ ] read lots of PGNs in a go, stop on errors?
@@ -59,7 +59,6 @@ v0.1
 ### CLEANUP
 A: assert/validate return values from functions finding indexes into the array throughout:
     - get_index_from_move, char_to_file_or_rank
-C: Can we simplify the hunting moves? (all pieces)
 D: manually create a PGN which tests edge-cases?:
     - en-passant, different levels of disambiguation
     - queenside castle

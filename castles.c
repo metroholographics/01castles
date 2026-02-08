@@ -20,14 +20,14 @@ int         current_board_index            = 0;
 void
 initialise_default_board(Piece *p)
 {
-    p[A*8+0] = W_ROOK;   p[A*8+7] = B_ROOK;
-    p[B*8+0] = W_KNIGHT; p[B*8+7] = B_KNIGHT;
-    p[C*8+0] = W_BISHOP; p[C*8+7] = B_BISHOP;
-    p[D*8+0] = W_QUEEN;  p[D*8+7] = B_QUEEN;
-    p[E*8+0] = W_KING;   p[E*8+7] = B_KING;
-    p[F*8+0] = W_BISHOP; p[F*8+7] = B_BISHOP;
-    p[G*8+0] = W_KNIGHT; p[G*8+7] = B_KNIGHT;
-    p[H*8+0] = W_ROOK;   p[H*8+7] = B_ROOK;
+    p[A * 8 + 0] = W_ROOK;   p[A* 8 + 7] = B_ROOK;
+    p[B * 8 + 0] = W_KNIGHT; p[B* 8 + 7] = B_KNIGHT;
+    p[C * 8 + 0] = W_BISHOP; p[C* 8 + 7] = B_BISHOP;
+    p[D * 8 + 0] = W_QUEEN;  p[D* 8 + 7] = B_QUEEN;
+    p[E * 8 + 0] = W_KING;   p[E* 8 + 7] = B_KING;
+    p[F * 8 + 0] = W_BISHOP; p[F* 8 + 7] = B_BISHOP;
+    p[G * 8 + 0] = W_KNIGHT; p[G* 8 + 7] = B_KNIGHT;
+    p[H * 8 + 0] = W_ROOK;   p[H* 8 + 7] = B_ROOK;
 
     for (int i = 0; i < 8; i++) {
         p[i * 8 + 1] = W_PAWN;
@@ -157,18 +157,18 @@ main(int argc, char *argv[])
 void
 store_game_in_boards(TurnHistory *th, PGN_Game p)
 {
-    th->num_turns = (p.num_turns+1)*2;
+    th->num_turns = (p.num_turns + 1) * 2;
     initialise_default_board(th->game_turns[0]);
 
     int board_index = 1;
-    for (int i = 0; i < p.num_turns+1; i++) {
+    for (int i = 0; i < p.num_turns + 1; i++) {
         PGN_Turn current_turn = p.move_buffer[i];
-        copy_board(th->game_turns[board_index], th->game_turns[board_index-1]);
+        copy_board(th->game_turns[board_index], th->game_turns[board_index - 1]);
         if (current_turn.white_move) {
             input_turn_on_board(th->game_turns[board_index], current_turn, PGN_WHITE);
         }
         board_index++;
-        copy_board(th->game_turns[board_index], th->game_turns[board_index-1]);
+        copy_board(th->game_turns[board_index], th->game_turns[board_index - 1]);
         if (current_turn.black_move) {
             input_turn_on_board(th->game_turns[board_index], current_turn, PGN_BLACK);
         }
@@ -194,8 +194,7 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
         return;
     }
 
-    char piece = '\0';
-    piece      = t.piece[color][0];
+    char piece = t.piece[color][0];
 
     switch (piece) {
         case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color);   break;
@@ -221,23 +220,20 @@ handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece
         return;
     }
 
-    //char pawn[2] = {'P', '\0'};
     handle_pawn_move(b, piece[color], destination, color);
 
     Piece promotion_piece = EMPTY;
-
     switch (prom_piece[0]) {
         case 'Q': promotion_piece = (color == PGN_WHITE) ? W_QUEEN  : B_QUEEN;  break;
         case 'R': promotion_piece = (color == PGN_WHITE) ? W_ROOK   : B_ROOK;   break;
         case 'B': promotion_piece = (color == PGN_WHITE) ? W_BISHOP : B_BISHOP; break;
         case 'N': promotion_piece = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT; break;
-        default : promotion_piece = EMPTY;                                      break;
     }
 
     if (promotion_piece != EMPTY) {
         b[destination_index] = promotion_piece;
     } else {
-        printf("ERROR PROMTION: wrong piece?\n");
+        printf("ERROR PROMOTION: wrong piece?\n");
     }
 }
 
@@ -247,14 +243,14 @@ handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
     Piece active_king = (color == PGN_WHITE) ? W_KING : B_KING;
     Piece active_rook = (color == PGN_WHITE) ? W_ROOK : B_ROOK;
 
-    bool valid_input = piece[color][0] == 'K' && piece[color+2][0] == 'R';
+    bool valid_input = piece[color][0] == 'K' && piece[color + 2][0] == 'R';
     if (!valid_input) {
         printf("ERROR CASTLE: wrong PGN input?\n");
         return;
     }
     bool kingside  = (destination[color][0] == 'g');
     bool queenside = (destination[color][0] == 'c');
-    if ((!kingside && !queenside) || (kingside && queenside)) {
+    if ((!kingside && !queenside)) {
         printf("ERROR CASTLE: destination\n");
         return;
     }
@@ -265,15 +261,15 @@ handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
     r_dest_index = r_origin_index = -1;
 
     if (kingside) {
-        k_dest_index   = (color == PGN_WHITE) ? G*8+0 : G*8+7;
-        k_origin_index = (color == PGN_WHITE) ? E*8+0 : E*8+7;
-        r_dest_index   = (color == PGN_WHITE) ? F*8+0 : F*8+7;
-        r_origin_index = (color == PGN_WHITE) ? H*8+0 : H*8+7;
+        k_dest_index   = (color == PGN_WHITE) ? G * 8 + 0 : G * 8 + 7;
+        k_origin_index = (color == PGN_WHITE) ? E * 8 + 0 : E * 8 + 7;
+        r_dest_index   = (color == PGN_WHITE) ? F * 8 + 0 : F * 8 + 7;
+        r_origin_index = (color == PGN_WHITE) ? H * 8 + 0 : H * 8 + 7;
     } else if (queenside) {
-        k_dest_index   = (color == PGN_WHITE) ? C*8+0 : C*8+7;
-        k_origin_index = (color == PGN_WHITE) ? E*8+0 : E*8+7;
-        r_dest_index   = (color == PGN_WHITE) ? D*8+0 : D*8+7;
-        r_origin_index = (color == PGN_WHITE) ? A*8+0 : A*8+7;
+        k_dest_index   = (color == PGN_WHITE) ? C * 8 + 0 : C * 8 + 7;
+        k_origin_index = (color == PGN_WHITE) ? E * 8 + 0 : E * 8 + 7;
+        r_dest_index   = (color == PGN_WHITE) ? D * 8 + 0 : D * 8 + 7;
+        r_origin_index = (color == PGN_WHITE) ? A * 8 + 0 : A * 8 + 7;
     }
 
     if (b[k_origin_index] != active_king) {
@@ -351,7 +347,7 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_queen < 0) {
-            printf("ERROR: INVALID QUEEN MOVE - file known\n");
+            printf("ERROR: INVALID QUEEN MOVE - file/rank known\n");
         }
     } else {
         for (int i = 0; i < 64; i++) {
@@ -370,14 +366,6 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
     if (found_queen >= 0) move_piece(b, found_queen, destination_index);
 
 }
-
-void
-move_piece(Piece* b, int from_index, int dest_index)
-{
-    b[dest_index] = b[from_index];
-    b[from_index] = EMPTY;
-}
-
 
 void
 handle_rook_move(Piece *b, char *piece, char *destination, int color)
@@ -416,7 +404,7 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_rook < 0) {
-            printf("ERROR: INVALID ROOK MOVE - file known\n");
+            printf("ERROR: INVALID ROOK MOVE - file/rank known\n");
         }
     } else {
         for (int i = 0; i < 64; i++) {
@@ -477,7 +465,7 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_bishop < 0) {
-            printf("ERROR: INVALID BISHOP MOVE: file known\n");
+            printf("ERROR: INVALID BISHOP MOVE: file/rank known\n");
             return;
         }
     } else {
@@ -537,7 +525,7 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_knight < 0) {
-            printf("ERROR: INVALID KNIGHT MOVE? - knight file known\n");
+            printf("ERROR: INVALID KNIGHT MOVE? - knight file/rank known\n");
             return;
         }
     } else {
@@ -623,7 +611,7 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         if (b[destination_index] == EMPTY) {
             //en-passant
             Piece passing_pawn = (active_pawn == W_PAWN) ? B_PAWN : W_PAWN;
-            if (b[destination_index+sign] == passing_pawn) {
+            if (b[destination_index + sign] == passing_pawn) {
                 b[destination_index + sign] = EMPTY;
             } else {
                 printf("ERROR: INVALID PAWN MOVE? - en passant\n");
@@ -635,14 +623,19 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
     if (found_pawn >= 0) move_piece(b, found_pawn, destination_index);
 }
 
+void
+move_piece(Piece* b, int from_index, int dest_index)
+{
+    b[dest_index] = b[from_index];
+    b[from_index] = EMPTY;
+}
 
 bool
 not_pinned(Piece *b, int piece_index, int dest_index, int color)
 {
     // return true if piece is not pinned
     // piece is pinned if it has an uninterrupted diagonal or straight ('Dir') to it's king
-    // && an uninterrupted 'Dir' to Rook or Queen (Dir==straight) or Bishop, Queen if (Dir==diag.)
-
+    // && an uninterrupted 'Dir' to Rook or Queen (Dir==straight) or Bishop, Queen (Dir==diag.)
     Piece king       = (color == PGN_WHITE) ? W_KING : B_KING;
     int   found_king = -1;
     for (int i = 0; i < 64; i++) {
@@ -658,7 +651,6 @@ not_pinned(Piece *b, int piece_index, int dest_index, int color)
     PathVec k_to_piece = get_path_vector(found_king, piece_index);
     int k_file = found_king / 8;
     int k_rank = found_king % 8;
-
 
     if (trace_clear_line(b, piece_index, found_king, STRAIGHT)) {
         Piece opp_rook  = (color == PGN_WHITE) ? B_ROOK : W_ROOK;
@@ -703,14 +695,12 @@ not_pinned(Piece *b, int piece_index, int dest_index, int color)
             }
         }
     }
-
     return true;
 }
 
 PathVec
 get_path_vector(int from_index, int to_index)
 {
-
     int from_file = from_index / 8;
     int from_rank = from_index % 8;
     int to_file   = to_index / 8;
