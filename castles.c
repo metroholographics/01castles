@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/5examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/3examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -20,14 +20,14 @@ int         current_board_index            = 0;
 void
 initialise_default_board(Piece *p)
 {
-    p[A * 8 + 0] = W_ROOK;   p[A* 8 + 7] = B_ROOK;
-    p[B * 8 + 0] = W_KNIGHT; p[B* 8 + 7] = B_KNIGHT;
-    p[C * 8 + 0] = W_BISHOP; p[C* 8 + 7] = B_BISHOP;
-    p[D * 8 + 0] = W_QUEEN;  p[D* 8 + 7] = B_QUEEN;
-    p[E * 8 + 0] = W_KING;   p[E* 8 + 7] = B_KING;
-    p[F * 8 + 0] = W_BISHOP; p[F* 8 + 7] = B_BISHOP;
-    p[G * 8 + 0] = W_KNIGHT; p[G* 8 + 7] = B_KNIGHT;
-    p[H * 8 + 0] = W_ROOK;   p[H* 8 + 7] = B_ROOK;
+    p[A * 8 + 0] = W_ROOK;   p[A * 8 + 7] = B_ROOK;
+    p[B * 8 + 0] = W_KNIGHT; p[B * 8 + 7] = B_KNIGHT;
+    p[C * 8 + 0] = W_BISHOP; p[C * 8 + 7] = B_BISHOP;
+    p[D * 8 + 0] = W_QUEEN;  p[D * 8 + 7] = B_QUEEN;
+    p[E * 8 + 0] = W_KING;   p[E * 8 + 7] = B_KING;
+    p[F * 8 + 0] = W_BISHOP; p[F * 8 + 7] = B_BISHOP;
+    p[G * 8 + 0] = W_KNIGHT; p[G * 8 + 7] = B_KNIGHT;
+    p[H * 8 + 0] = W_ROOK;   p[H * 8 + 7] = B_ROOK;
 
     for (int i = 0; i < 8; i++) {
         p[i * 8 + 1] = W_PAWN;
@@ -579,15 +579,8 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
     int   found_pawn  = -1;
     //Normal pawn move (no file or rank disambiguation)
     if (piece[1] == '\0') {
-        int file = destination_index / 8;
-        for (int i = file * 8; i < file * 8 + 8; i++) {
-            if (b[i] == active_pawn) {
-                if (trace_clear_line(b, i, destination_index, STRAIGHT)) {
-                    found_pawn = i;
-                    break;
-                }
-            }
-        }
+        if (b[destination_index + 2*sign] == active_pawn) found_pawn = destination_index + 2*sign;
+        if (b[destination_index + sign]   == active_pawn) found_pawn = destination_index + sign;
         if (found_pawn < 0) {
             printf("ERROR: INVALID PAWN MOVE? - normal\n");
             return;
