@@ -8,7 +8,7 @@
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/7examplepgn.txt";
+const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};

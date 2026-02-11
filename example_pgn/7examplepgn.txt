@@ -1,4 +1,4 @@
- [Event "Belgrade"]
+[Event "Belgrade"]
 [Site "Belgrade YUG"]
 [Date "1989.02.17"]
 [White "Ivan Nikolic"]

@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <ctype.h>
-#include <stdbool.h>
+
 #include "pgn_reader.h"
 
 /*Usage:
@@ -43,15 +41,6 @@ parse_movetext(PGN_Game *g, FILE *f)
 {
     fpos_t start;
     fgetpos(f, &start);
-    
-    //REMOVE AFTER TESTING
-    // {   
-    //     char c = '\0';
-    //     while ((c = getc(f)) != EOF)
-    //     printf("%c", c);
-    //     printf("\n\n");
-    //     fsetpos(f, &start);
-    // }
     
     g->num_turns = -1;
     for (;;) {
@@ -178,6 +167,10 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
     bool white_done, black_done;
     white_done = black_done = false;
     char white_move_buffer[9], black_move_buffer[18];
+    memset(white_move_buffer, '\0', 9);
+    memset(black_move_buffer, '\0', 18);
+
+    //reset these to null - memset?
     int white_len, black_len, dummy;
     white_len = black_len = dummy = 0;
     t->white_move = t->black_move = false;
@@ -196,7 +189,7 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         int i = 0;
         while ((c = getc(f)) != ' ') {
             white_move_buffer[i++] = c;
-        } //c = ' '
+        }
         white_len = i;
         white_done = true;
     }
@@ -222,10 +215,6 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
             }
         }
     }
-    // for (int i = 0; i < white_len; i++) {
-    //     char j = white_move_buffer[i];
-    //     printf("%c", j);
-    // }
 
     if (c == ' ') {
         while((c = getc(f)) == ' ');
@@ -264,12 +253,6 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         while ((c = getc(f)) != ')');
     }
 
-    // for (int i = 0; i < black_len; i++) {
-    //     char j = black_move_buffer[i];
-    //     printf("%c", j);
-    // }
-
-    // printf("\n");
     return PGN_SUCCESS;
 }
 

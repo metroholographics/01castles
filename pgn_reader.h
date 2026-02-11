@@ -1,6 +1,10 @@
 #ifndef PGN_READER_H
 #define PGN_READER_H
 
+#include <stdio.h>
+#include <ctype.h>
+#include <stdbool.h>
+#include <string.h>
 
 #define PGN_LOG_ERROR(e) (printf("!!PGN_Error: %s\n", pgn_get_error((e))))
 

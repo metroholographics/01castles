@@ -25,7 +25,7 @@ v0.1
     - [x] Populate turn buffer
         - [x] Castle
         - [x] Promotion
-- [!] Step through move history on board
+- [~] Step through move history on board
     - [x] figure out turn history buffer/pgn game turns relationship
     - [x] cache each turn and step through boards
     - [x] pawn moves
@@ -42,13 +42,13 @@ v0.1
     - [x] Add rank disambiguation if not a file
     - [x] Check for king pins when moving piece
     - [x] Helpers for similar functions across all pieces
-    - [ ] Cleanup A - assert macro?
 - [ ] Mass PGN tester
     - [ ] read lots of PGNs in a go, stop on errors?
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
 - [!] Flip board
     - [ ] Make this more generic
+- [ ] Cleanup A - assert macro?
 - [ ] Game effects
 - [ ] On-screen text box to paste pgn data
 - [ ] Better PGN error handling
