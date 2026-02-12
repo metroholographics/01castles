@@ -10,3 +10,6 @@ all:
 
 pgn:
 	$(CC) $(C_FLAGS) pgn_reader.c -o pgn
+
+test:
+	$(CC) $(C_FLAGS) pgn_tester.c $(C_FILES) -o test $(LINK_FLAGS)

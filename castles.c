@@ -6,6 +6,12 @@
 
 #define DEBUG 1
 
+const int WINDOW_WIDTH  = 900;
+const int WINDOW_HEIGHT = 600;
+const int BOARD_SIZE    = 560;
+const int BOARD_TILE    = BOARD_SIZE / 8;
+const int FPS           = 30;
+
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
 const char *PGN_FILEPATH = "example_pgn/1examplepgn.txt";

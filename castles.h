@@ -12,12 +12,6 @@
 #define LIGHT_SQUARE (SDL_Color) {145, 163, 170, 255}
 #define DARK_SQUARE  (SDL_Color) {76, 86, 113, 255}
 
-const int WINDOW_WIDTH  = 900;
-const int WINDOW_HEIGHT = 600;
-const int BOARD_SIZE    = 560;
-const int BOARD_TILE    = BOARD_SIZE / 8;
-const int FPS           = 30;
-
 typedef enum {
     EMPTY=0,
     W_ROOK, W_KNIGHT, W_BISHOP, W_QUEEN, W_KING, W_PAWN,
