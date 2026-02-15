@@ -13,6 +13,36 @@
 #define DARK_SQUARE  (SDL_Color) {76, 86, 113, 255}
 
 typedef enum {
+    CSTL_K_NORMAL    = -26,
+    CSTL_K_DEST      = -25,
+    CSTL_Q_NORMAL    = -24,
+    CSTL_Q_KNOWN     = -23,
+    CSTL_Q_DEST      = -22,
+    CSTL_R_NORMAL    = -21,
+    CSTL_R_KNOWN     = -20,
+    CSTL_R_DEST      = -19,
+    CSTL_B_NORMAL    = -18,
+    CSTL_B_KNOWN     = -17,
+    CSTL_B_DEST      = -16,
+    CSTL_N_NORMAL    = -15,
+    CSTL_N_KNOWN     = -14,
+    CSTL_N_DEST      = -13,
+    CSTL_P_EN_PASS   = -12,
+    CSTL_P_CAPTURE   = -11,
+    CSTL_P_NORMAL    = -10,
+    CSTL_P_DEST      = -9,
+    CSTL_CSTL_ROOK   = -8,
+    CSTL_CSTL_KING   = -7,
+    CSTL_CSTL_DEST   = -6,
+    CSTL_CSTL_PIECE  = -5,
+    CSTL_PRM_PMOVE   = -4,
+    CSTL_PRM_PSQUARE = -3,
+    CSTL_PRM_DEST    = -2,
+    CSTL_PRM_NO_PAWN = -1,
+    CSTL_SUCCESS = 0
+} CSTL_Error;
+
+typedef enum {
     EMPTY=0,
     W_ROOK, W_KNIGHT, W_BISHOP, W_QUEEN, W_KING, W_PAWN,
     B_ROOK, B_KNIGHT, B_BISHOP, B_QUEEN, B_KING, B_PAWN,
@@ -57,7 +87,7 @@ void       populate_piece_sprite_array(SDL_FRect *sprite_array);
 void initialise_default_board(Piece *p);
 void store_game_in_boards(TurnHistory *th, PGN_Game p);
 void copy_board(Piece *target, Piece *source);
-void input_turn_on_board(Piece* b, PGN_Turn t, int color);
+CSTL_Error input_turn_on_board(Piece* b, PGN_Turn t, int color);
 
 
 bool    is_file(char c);
@@ -70,14 +100,16 @@ bool    not_pinned(Piece *b, int piece_index, int dest_index, int color);
 PathVec get_path_vector(int from_index, int to_index);
 void    move_piece(Piece *b, int from_index, int dest_index);
 
-void handle_pawn_move(Piece *b, char *piece, char *destination, int color);
-void handle_knight_move(Piece *b, char *piece, char *destination, int color);
+
+CSTL_Error cstl_log(CSTL_Error e);
+CSTL_Error handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color);
+CSTL_Error handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece,int color);
+CSTL_Error handle_pawn_move(Piece *b, char *piece, char *destination, int color);
+CSTL_Error handle_knight_move(Piece *b, char *piece, char *destination, int color);
 bool validate_knight_move(int origin_index, int destination_index);
-void handle_bishop_move(Piece *b, char *piece, char *destination, int color);
-void handle_rook_move(Piece *b, char *piece, char *destination, int color);
-void handle_queen_move(Piece *b, char *piece, char *destination, int color);
-void handle_king_move(Piece *b, char *destination, int color);
-void handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color);
-void handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece,int color);
+CSTL_Error handle_bishop_move(Piece *b, char *piece, char *destination, int color);
+CSTL_Error handle_rook_move(Piece *b, char *piece, char *destination, int color);
+CSTL_Error handle_queen_move(Piece *b, char *piece, char *destination, int color);
+CSTL_Error handle_king_move(Piece *b, char *destination, int color);
 
 #endif

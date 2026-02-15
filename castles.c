@@ -183,67 +183,72 @@ store_game_in_boards(TurnHistory *th, PGN_Game p)
     printf("board index: %d\n", board_index);
 }
 
-void
+CSTL_Error
 input_turn_on_board(Piece* b, PGN_Turn t, int color)
 {
     bool castle    = t.castle[color];
     bool promotion = t.promotion[color];
 
-    //TODO: handle castle and promotion moves first if exist
+    CSTL_Error e = CSTL_SUCCESS;
     if (castle) {
-        handle_castle(b, t.piece, t.move_to, color);
-        return;
+        return handle_castle(b, t.piece, t.move_to, color);
     }
 
     if (promotion) {
-        handle_promotion(b, t.piece, t.move_to[color],t.promotion_piece[color], color);
-        return;
+        return handle_promotion(b, t.piece, t.move_to[color],t.promotion_piece[color], color);
     }
 
     char piece = t.piece[color][0];
 
     switch (piece) {
-        case 'P': handle_pawn_move(b, t.piece[color], t.move_to[color], color);   break;
-        case 'N': handle_knight_move(b, t.piece[color], t.move_to[color], color); break;
-        case 'B': handle_bishop_move(b,t.piece[color], t.move_to[color], color);  break;
-        case 'R': handle_rook_move(b, t.piece[color], t.move_to[color], color);   break;
-        case 'Q': handle_queen_move(b, t.piece[color], t.move_to[color], color);  break;
-        case 'K': handle_king_move(b, t.move_to[color], color);                   break;
+        case 'P': e = handle_pawn_move(b, t.piece[color], t.move_to[color], color);   break;
+        case 'N': e = handle_knight_move(b, t.piece[color], t.move_to[color], color); break;
+        case 'B': e = handle_bishop_move(b,t.piece[color], t.move_to[color], color);  break;
+        case 'R': e = handle_rook_move(b, t.piece[color], t.move_to[color], color);   break;
+        case 'Q': e = handle_queen_move(b, t.piece[color], t.move_to[color], color);  break;
+        case 'K': e = handle_king_move(b, t.move_to[color], color);                   break;
     }
+
+    return e;
 }
 
-void
-handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece,int color)
+CSTL_Error
+cstl_log(CSTL_Error e)
 {
-    bool valid_input = piece[color][0] == 'P';
-    if (!valid_input) {
-        printf("ERROR PROMOTION: not a pawn moving?\n");
-        return;
-    }
-    int destination_index = get_index_from_square(destination[0], destination[1]);
-    if (destination_index < 0) {
-        printf("ERROR DESTINATION INDEX: PROMOTION\n");
-        return;
+    switch (e) {
+        case CSTL_PRM_NO_PAWN: printf("ERROR PROMOTION: not a pawn moving?\n");        break;
+        case CSTL_PRM_DEST:    printf("ERROR PROMOTION: invalid dest index\n");        break;
+        case CSTL_PRM_PSQUARE: printf("ERROR PROMOTION: promotion piece empty\n");     break;
+        case CSTL_PRM_PMOVE:   printf("ERROR PROMOTION: moving promotion pawn\n");     break;
+        case CSTL_CSTL_PIECE:  printf("ERROR CASTLE: pgn input not king or rook\n");   break;
+        case CSTL_CSTL_DEST:   printf("ERROR CASTLE: pgn input wrong dest squares\n"); break;
+        case CSTL_CSTL_KING:   printf("ERROR CASTLE: king not on right square\n");     break;
+        case CSTL_CSTL_ROOK:   printf("ERROR CASTLE: rook not on right square\n");     break;
+        case CSTL_P_DEST:      printf("ERROR PAWN MOVE: invalid dest index\n");        break;
+        case CSTL_P_NORMAL:    printf("ERROR PAWN MOVE: normal move\n");               break;
+        case CSTL_P_CAPTURE:   printf("ERROR PAWN MOVE: capture\n");                   break;
+        case CSTL_P_EN_PASS:   printf("ERROR PAWN MOVE: en passant\n");                break;
+        case CSTL_N_DEST:      printf("ERROR KNIGHT MOVE: invalid dest index\n");      break;
+        case CSTL_N_KNOWN:     printf("ERROR KNIGHT MOVE: file/rank known\n");         break;
+        case CSTL_N_NORMAL:    printf("ERROR KNIGHT MOVE: normal\n");                  break;
+        case CSTL_B_DEST:      printf("ERROR BISHOP MOVE: invalid dest index\n");      break;
+        case CSTL_B_KNOWN:     printf("ERROR BISHOP MOVE: file/rank known\n");         break;
+        case CSTL_B_NORMAL:    printf("ERROR BISHOP MOVE: normal\n");                  break;
+        case CSTL_R_DEST:      printf("ERROR ROOK MOVE: invalid dest index\n");        break;
+        case CSTL_R_KNOWN:     printf("ERROR ROOK MOVE: file/rank known\n");           break;
+        case CSTL_R_NORMAL:    printf("ERROR ROOK MOVE: normal\n");                    break;
+        case CSTL_Q_DEST:      printf("ERROR QUEEN MOVE: invalid dest index\n");       break;
+        case CSTL_Q_KNOWN:     printf("ERROR QUEEN MOVE: file/rank known\n");          break;
+        case CSTL_Q_NORMAL:    printf("ERROR QUEEN MOVE: normal\n");                   break;
+        case CSTL_K_DEST:      printf("ERROR KING MOVE: invalid dest index\n");        break;
+        case CSTL_K_NORMAL:    printf("ERROR KING MOVE: normal\n");                    break;
+        default:                                                                       break;
     }
 
-    handle_pawn_move(b, piece[color], destination, color);
-
-    Piece promotion_piece = EMPTY;
-    switch (prom_piece[0]) {
-        case 'Q': promotion_piece = (color == PGN_WHITE) ? W_QUEEN  : B_QUEEN;  break;
-        case 'R': promotion_piece = (color == PGN_WHITE) ? W_ROOK   : B_ROOK;   break;
-        case 'B': promotion_piece = (color == PGN_WHITE) ? W_BISHOP : B_BISHOP; break;
-        case 'N': promotion_piece = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT; break;
-    }
-
-    if (promotion_piece != EMPTY) {
-        b[destination_index] = promotion_piece;
-    } else {
-        printf("ERROR PROMOTION: wrong piece?\n");
-    }
+    return e;
 }
 
-void
+CSTL_Error
 handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
 {
     Piece active_king = (color == PGN_WHITE) ? W_KING : B_KING;
@@ -251,14 +256,12 @@ handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
 
     bool valid_input = piece[color][0] == 'K' && piece[color + 2][0] == 'R';
     if (!valid_input) {
-        printf("ERROR CASTLE: wrong PGN input?\n");
-        return;
+        return cstl_log(CSTL_CSTL_PIECE);
     }
     bool kingside  = (destination[color][0] == 'g');
     bool queenside = (destination[color][0] == 'c');
     if ((!kingside && !queenside)) {
-        printf("ERROR CASTLE: destination\n");
-        return;
+        return cstl_log(CSTL_CSTL_DEST);
     }
 
     int k_dest_index, k_origin_index;
@@ -279,25 +282,58 @@ handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color)
     }
 
     if (b[k_origin_index] != active_king) {
-        printf("ERROR CASTLE: no king\n");
-        return;
+        return cstl_log(CSTL_CSTL_KING);
     }
     if (b[r_origin_index] != active_rook) {
-        printf("ERROR CASTLE: no rook\n");
-        return;
+        return cstl_log(CSTL_CSTL_ROOK);
     }
     move_piece(b, k_origin_index, k_dest_index);
     move_piece(b, r_origin_index, r_dest_index);
-    return;
+    return CSTL_SUCCESS;
 }
 
-void
+CSTL_Error
+handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece,int color)
+{
+    bool valid_input = piece[color][0] == 'P';
+    CSTL_Error e;
+    if (!valid_input) {
+        return cstl_log(CSTL_PRM_NO_PAWN);
+    }
+    int destination_index = get_index_from_square(destination[0], destination[1]);
+    if (destination_index < 0) {
+        return cstl_log(CSTL_PRM_DEST);
+    }
+
+    e = handle_pawn_move(b, piece[color], destination, color);
+    if (e != CSTL_SUCCESS) {
+        cstl_log(CSTL_PRM_PMOVE);
+        return cstl_log(e);
+    }
+
+    Piece promotion_piece = EMPTY;
+    switch (prom_piece[0]) {
+        case 'Q': promotion_piece = (color == PGN_WHITE) ? W_QUEEN  : B_QUEEN;  break;
+        case 'R': promotion_piece = (color == PGN_WHITE) ? W_ROOK   : B_ROOK;   break;
+        case 'B': promotion_piece = (color == PGN_WHITE) ? W_BISHOP : B_BISHOP; break;
+        case 'N': promotion_piece = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT; break;
+    }
+
+    if (promotion_piece != EMPTY) {
+        b[destination_index] = promotion_piece;
+    } else {
+        return cstl_log(CSTL_PRM_PSQUARE);
+    }
+    return CSTL_SUCCESS;
+}
+
+
+CSTL_Error
 handle_king_move(Piece *b, char *destination, int color)
 {
     int destination_index = get_index_from_square(destination[0], destination[1]);
     if (destination_index < 0) {
-        printf("ERROR DESTINATION INDEX: KING MOVE\n");
-        return;
+        return cstl_log(CSTL_K_DEST);
     }
     Piece active_king = (color == PGN_WHITE) ? W_KING : B_KING;
     int   found_king  = -1;
@@ -312,17 +348,17 @@ handle_king_move(Piece *b, char *destination, int color)
     if (found_king >= 0) {
         move_piece(b, found_king, destination_index);
     } else {
-        printf("ERROR KING MOVE\n");
+        return cstl_log(CSTL_K_NORMAL);
     }
+    return CSTL_SUCCESS;
 }
 
-void
+CSTL_Error
 handle_queen_move(Piece *b, char *piece, char *destination, int color)
 {
     int destination_index = get_index_from_square(destination[0], destination[1]);
     if (destination_index < 0) {
-        printf("ERROR DESTINATION INDEX: QUEEN MOVE\n");
-        return;
+        return cstl_log(CSTL_Q_DEST);
     }
     Piece active_queen = (color == PGN_WHITE) ? W_QUEEN : B_QUEEN;
     int   found_queen  = -1;
@@ -353,7 +389,7 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_queen < 0) {
-            printf("ERROR: INVALID QUEEN MOVE - file/rank known\n");
+            return cstl_log(CSTL_Q_KNOWN);
         }
     } else {
         for (int i = 0; i < 64; i++) {
@@ -365,21 +401,20 @@ handle_queen_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_queen < 0) {
-            printf("ERROR: INVALID QUEEN MOVE - normal\n");
+            return cstl_log(CSTL_Q_NORMAL);
         }
     }
 
     if (found_queen >= 0) move_piece(b, found_queen, destination_index);
-
+    return CSTL_SUCCESS;
 }
 
-void
+CSTL_Error
 handle_rook_move(Piece *b, char *piece, char *destination, int color)
 {
     int destination_index = get_index_from_square(destination[0], destination[1]);
     if (destination_index < 0) {
-        printf("ERROR DESTINATION INDEX: ROOK MOVE\n");
-        return;
+        return cstl_log(CSTL_R_DEST);
     }
     Piece active_rook = (color == PGN_WHITE) ? W_ROOK : B_ROOK;
     int   found_rook  = -1;
@@ -410,7 +445,7 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_rook < 0) {
-            printf("ERROR: INVALID ROOK MOVE - file/rank known\n");
+            return cstl_log(CSTL_R_KNOWN);
         }
     } else {
         for (int i = 0; i < 64; i++) {
@@ -422,20 +457,20 @@ handle_rook_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_rook < 0) {
-            printf("ERROR: INVALID ROOK MOVE - normal\n");
+            return cstl_log(CSTL_R_NORMAL);
         }
     }
 
     if (found_rook >= 0) move_piece(b, found_rook, destination_index);
+    return CSTL_SUCCESS;
 }
 
-void
+CSTL_Error
 handle_bishop_move(Piece *b, char *piece, char *destination, int color)
 {
     int destination_index = get_index_from_square(destination[0], destination[1]);
     if (destination_index < 0) {
-        printf("ERROR DESTINATION INDEX: BISHOP MOVE\n");
-        return;
+        return cstl_log(CSTL_B_DEST);
     }
     Piece active_bishop    = (color == PGN_WHITE) ? W_BISHOP : B_BISHOP;
     int   found_bishop     = -1;
@@ -471,8 +506,7 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_bishop < 0) {
-            printf("ERROR: INVALID BISHOP MOVE: file/rank known\n");
-            return;
+            return cstl_log(CSTL_B_KNOWN);
         }
     } else {
         for (int i = 0; i < 64; i++) {
@@ -486,21 +520,20 @@ handle_bishop_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_bishop < 0) {
-            printf("ERROR: INVALID BISHOP MOVE - normal\n");
-            return;
+            return cstl_log(CSTL_B_NORMAL);
         }
     }
 
     if (found_bishop >= 0) move_piece(b, found_bishop, destination_index);
+    return CSTL_SUCCESS;
 }
 
-void
+CSTL_Error
 handle_knight_move(Piece *b, char *piece, char *destination, int color)
 {
     int destination_index = get_index_from_square(destination[0], destination[1]);
     if (destination_index < 0) {
-        printf("ERROR DESTINATION INDEX: KNIGHT MOVE\n");
-        return;
+        return cstl_log(CSTL_N_DEST);
     }
     Piece active_knight = (color == PGN_WHITE) ? W_KNIGHT : B_KNIGHT;
     int   found_knight  = -1;
@@ -531,8 +564,7 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_knight < 0) {
-            printf("ERROR: INVALID KNIGHT MOVE? - knight file/rank known\n");
-            return;
+            return cstl_log(CSTL_N_KNOWN);
         }
     } else {
         for (int i = 0; i < 64; i++) {
@@ -544,12 +576,12 @@ handle_knight_move(Piece *b, char *piece, char *destination, int color)
             }
         }
         if (found_knight < 0) {
-            printf("ERROR: INVALID KNIGHT MOVE? - knight hunt\n");
-            return;
+            return cstl_log(CSTL_N_NORMAL);
         }
     }
 
     if (found_knight >= 0) move_piece(b, found_knight, destination_index);
+    return CSTL_SUCCESS;
 }
 
 bool
@@ -571,13 +603,12 @@ validate_knight_move(int origin_index, int destination_index)
     );
 }
 
-void
+CSTL_Error
 handle_pawn_move(Piece *b, char *piece, char *destination, int color)
 {
     int destination_index = get_index_from_square(destination[0], destination[1]);
     if (destination_index < 0) {
-        printf("ERROR DESTINATION INDEX: PAWN MOVE\n");
-        return;
+        return cstl_log(CSTL_P_DEST);
     }
 
     Piece active_pawn = (color == PGN_WHITE) ? W_PAWN : B_PAWN;
@@ -588,8 +619,7 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         if (b[destination_index + 2*sign] == active_pawn) found_pawn = destination_index + 2*sign;
         if (b[destination_index + sign]   == active_pawn) found_pawn = destination_index + sign;
         if (found_pawn < 0) {
-            printf("ERROR: INVALID PAWN MOVE? - normal\n");
-            return;
+            return cstl_log(CSTL_P_NORMAL);
         }
     } else {
         int file = char_to_file_or_rank(piece[1]);
@@ -601,25 +631,22 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
                 }
             }
         }
-
         if (found_pawn < 0) {
-            printf("ERROR: INVALID PAWN MOVE? = capture\n");
-            return;
+            return cstl_log(CSTL_P_CAPTURE);
         }
-
         if (b[destination_index] == EMPTY) {
             //en-passant
             Piece passing_pawn = (active_pawn == W_PAWN) ? B_PAWN : W_PAWN;
             if (b[destination_index + sign] == passing_pawn) {
                 b[destination_index + sign] = EMPTY;
             } else {
-                printf("ERROR: INVALID PAWN MOVE? - en passant\n");
-                return;
+                return cstl_log(CSTL_P_EN_PASS);
             }
         }
     }
 
     if (found_pawn >= 0) move_piece(b, found_pawn, destination_index);
+    return CSTL_SUCCESS;
 }
 
 void
@@ -686,7 +713,7 @@ not_pinned(Piece *b, int piece_index, int dest_index, int color)
                 if (p == opp_bishop || p == opp_queen) {
                     PathVec k_to_dest = get_path_vector(found_king, dest_index);
                     return (
-                        (k_to_dest.f_step == k_to_piece.f_step) && 
+                        (k_to_dest.f_step == k_to_piece.f_step) &&
                         (k_to_dest.r_step == k_to_piece.r_step)
                     );
                 }

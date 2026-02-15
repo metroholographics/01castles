@@ -1,4 +1,6 @@
 #include "castles.h"
+#include "string.h"
+
 
 const char *example_pgn_paths[] = {
     "example_pgn/1examplepgn.txt",
@@ -15,12 +17,11 @@ const int num_examples = ARRAY_SIZE(example_pgn_paths);
 
 int main(void)
 {
-
-    TurnHistory games[num_examples] = {0};
+    TurnHistory games[num_examples];
+    memset(games, 0, sizeof(TurnHistory));
     for (int i = 0; i < num_examples; i++) {
         printf("%s\n", example_pgn_paths[i]);
     }
-
 
     for (int i = 0; i < num_examples; i++) {
         PGN_Game g;
@@ -34,10 +35,6 @@ int main(void)
 
         TurnHistory g_turn = games[i];
         store_game_in_boards(&g_turn, g);
-        
-
-
-
     }
 
     return 0;
