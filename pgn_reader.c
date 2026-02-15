@@ -6,6 +6,8 @@
 -returns negative number if error parsing the pgn, else PGN_GAME_STRUCT
 is populated
 */
+#define PGN_DEBUG 0
+
 PGN_Error
 pgn_create_game(PGN_Game *g, const char *filepath)
 {
@@ -150,14 +152,17 @@ pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
         }
     }
 
-    printf("\n---Piece %s moves to %s\n", t->piece[color_index], t->move_to[color_index]);
-    if (t->castle[color_index]) {
-        printf("\t %s moves to %s\n", t->piece[color_index+PGN_ROOK_OFFSET],
-            t->move_to[color_index+PGN_ROOK_OFFSET]);
+    if (PGN_DEBUG) {
+        printf("\n---Piece %s moves to %s\n", t->piece[color_index], t->move_to[color_index]);
+        if (t->castle[color_index]) {
+            printf("\t %s moves to %s\n", t->piece[color_index+PGN_ROOK_OFFSET],
+                t->move_to[color_index+PGN_ROOK_OFFSET]);
+        }
+        if (t->promotion[color_index]) {
+            printf("\t %s promotes to %s\n", t->piece[color_index], t->promotion_piece[color_index]);
+        }
     }
-    if (t->promotion[color_index]) {
-        printf("\t %s promotes to %s\n", t->piece[color_index], t->promotion_piece[color_index]);
-    }
+
     return PGN_SUCCESS;
 }
 
@@ -181,7 +186,7 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         PGN_LOG_ERROR(PGN_ERR_SCANLINE);
         return PGN_ERR_ENDGAME;
     }; 
-    printf("##%d: ", dummy);
+    if (PGN_DEBUG) printf("##%d: ", dummy);
     //read and discard '.'
     getc(f);
 
@@ -363,7 +368,7 @@ const char*
 pgn_get_error(PGN_Error e)
 {
     switch (e) {
-        case PGN_ERR_FILE_OPEN: return "couldn't open file";
+        case PGN_ERR_FILE_OPEN: return "couldn't open file - wrong filename?";
         case PGN_ERR_TAG_BRACE: return "check if missing ']' in tag pairs";
         case PGN_ERR_STRIP_TAG: return "couldn't strip tags from file";
         case PGN_ERR_SCANLINE:  return "error scanning turn while reading pgn data";

@@ -1,0 +1,15 @@
+[Event "World Championship 1st"]
+[Site "USA"]
+[Date "1886.??.??"]
+[Round "19"]
+[White "Zukertort, Johannes Hermann"]
+[Black "Steinitz, William"]
+[Result "0-1"]
+[WhiteElo ""]
+[BlackElo ""]
+[ECO "D53"]
+
+1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Be7 5.Nf3 O-O 6.c5 b6 7.b4 bxc5 8.dxc5 a5
+9.a3 d4 10.Bxf6 gxf6 11.Na4 e5 12.b5 Be6 13.g3 c6 14.bxc6 Nxc6 15.Bg2 Rb8
+16.Qc1 d3 17.e3 e4 18.Nd2 f5 19.O-O Re8 20.f3 Nd4 21.exd4 Qxd4+ 22.Kh1 e3
+23.Nc3 Bf6 24.Ndb1 d2 25.Qc2 Bb3 26.Qxf5 d1=Q 27.Nxd1 Bxd1 28.Nc3 e2 29.Raxd1 Qxc3  0-1

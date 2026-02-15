@@ -43,8 +43,9 @@ v0.1
     - [x] Check for king pins when moving piece
     - [x] Helpers for similar functions across all pieces
 - [!] Mass PGN tester
-    - [~] test environment
-    - [ ] castles error handling
+    - [x] test environment
+    - [x] castles error handling
+    - [~] stop on error in test
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
 - [!] Flip board

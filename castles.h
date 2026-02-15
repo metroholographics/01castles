@@ -85,7 +85,7 @@ SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
 void       populate_piece_sprite_array(SDL_FRect *sprite_array);
 
 void initialise_default_board(Piece *p);
-void store_game_in_boards(TurnHistory *th, PGN_Game p);
+CSTL_Error store_game_in_boards(TurnHistory *th, PGN_Game p);
 void copy_board(Piece *target, Piece *source);
 CSTL_Error input_turn_on_board(Piece* b, PGN_Turn t, int color);
 
