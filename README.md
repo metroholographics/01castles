@@ -21,9 +21,10 @@ v0.1
     - [x] test environment
     - [x] castles error handling
     - [x] stop on error in test
-    - [ ] run more tests
-        - [~] fix pin check - messing with the piece index doesn't work
+    - [!] run more tests
+        - [x] fix pin check - messing with the piece index doesn't work
         - [ ] pgn_reader updating 'c'
+        - [ ] more info for testing - game length (manual?)
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
 - [!] Flip board
