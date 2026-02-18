@@ -123,7 +123,7 @@ pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index)
             t->piece[color_index][0] = 'P';
             t->piece[color_index][1] = '\0';
         } else if (len == 1) {
-            t->piece[color_index][0] = buffer[0];
+            t->piece[color_index][0] = buffer[start];
             t->piece[color_index][1] = '\0';
         } else if (len >= 2) {
             if (buffer[start+1] == 'x') {
@@ -221,6 +221,8 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         }
     }
 
+    //TODO:: 'c' needs to have the updated value after going through the white move - pass
+    // a pointer? or find a way to set the current cursor to the file pos?
     if (c == ' ') {
         while((c = getc(f)) == ' ');
         ungetc(c, f);
@@ -279,6 +281,10 @@ pgn_read_move(char* buff, int buff_max, FILE* f)
         }
         if (c == '{') {
             while ((c = getc(f)) != '}');
+            c = getc(f);
+        }
+        if (c == '(') {
+            while ((c = getc(f)) != ')');
             c = getc(f);
         }
         if (c == '.') {

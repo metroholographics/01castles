@@ -22,7 +22,9 @@ const char *example_pgn_paths[] = {
     "example_tests/17.txt",
     "example_tests/18.txt",
     "example_tests/19.txt",
-    "example_tests/20.txt"
+    "example_tests/20.txt",
+    "example_tests/21.txt",
+    "example_tests/22.txt"
 };
 
 const int num_examples = ARRAY_SIZE(example_pgn_paths);
@@ -30,7 +32,6 @@ const int num_examples = ARRAY_SIZE(example_pgn_paths);
 
 int main(void)
 {
-    printf("%lld\n", sizeof(int));
     TurnHistory *games = (TurnHistory*) calloc(num_examples, sizeof(TurnHistory));
 
     for (int i = 0; i < num_examples; i++) {

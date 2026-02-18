@@ -14,38 +14,16 @@ v0.1
 - [x] Window, Renderer
 - [x] Loop, FPS
 - [x] Game data
-    - [x] Board
-    - [x] Pieces
 - [x] Render default game state
-    - [x] Grid
-    - [x] Piece sprites
 - [x] Parse PGN movetext
-    - [x] Strip tag pairs
-    - [x] Read turn
-    - [x] Populate turn buffer
-        - [x] Castle
-        - [x] Promotion
 - [x] Step through move history on board
-    - [x] figure out turn history buffer/pgn game turns relationship
-    - [x] cache each turn and step through boards
-    - [x] pawn moves
-    - [x] knight moves
-    - [x] bishop moves
-    - [x] rook moves
-    - [x] queen moves
-    - [x] castle
-    - [x] king moves
-    - [x] promotion
-    - [x] fix pgn_reader reading all turns
-    - [x] "trace_clear_line" - add way to specify which type of line
-    - [x] Fix pawn move/promotion
-    - [x] Add rank disambiguation if not a file
-    - [x] Check for king pins when moving piece
-    - [x] Helpers for similar functions across all pieces
 - [!] Mass PGN tester
     - [x] test environment
     - [x] castles error handling
-    - [~] stop on error in test
+    - [x] stop on error in test
+    - [ ] run more tests
+        - [~] fix pin check - messing with the piece index doesn't work
+        - [ ] pgn_reader updating 'c'
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
 - [!] Flip board

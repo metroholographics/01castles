@@ -14,7 +14,7 @@ const int FPS           = 30;
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/6examplepgn.txt";
+const char *PGN_FILEPATH = "example_tests/22.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -671,6 +671,7 @@ not_pinned(Piece *b, int piece_index, int dest_index, int color)
     for (int i = 0; i < 64; i++) {
         if (b[i] == king) {
             found_king = i;
+            break;
         }
     }
     if (found_king < 0) {
@@ -686,14 +687,17 @@ not_pinned(Piece *b, int piece_index, int dest_index, int color)
         Piece opp_rook  = (color == PGN_WHITE) ? B_ROOK : W_ROOK;
         Piece opp_queen = (color == PGN_WHITE) ? B_QUEEN : W_QUEEN;
         while (piece_index >= 0 && piece_index < 64) {
+            int p_file = (piece_index / 8) + k_to_piece.f_step;
+            int p_rank = (piece_index % 8) + k_to_piece.r_step;
+            if (p_file < 0 || p_file >= 8 || p_rank < 0 || p_rank >= 8) return true;
             piece_index += 8 * k_to_piece.f_step;
             piece_index += k_to_piece.r_step;
             if (piece_index == dest_index) return true;
             Piece p = b[piece_index];
             if (p != EMPTY) {
                 if (p == opp_rook || p == opp_queen) {
-                    bool same_file = (piece_index / 8) == k_file;
-                    bool same_rank = (piece_index % 8) == k_rank;
+                    bool same_file = p_file == k_file;
+                    bool same_rank = p_rank == k_rank;
                     if (same_file && (dest_index / 8 != k_file)) {
                         return false;
                     } else if (same_rank && (dest_index % 8 != k_rank)) {
@@ -701,14 +705,16 @@ not_pinned(Piece *b, int piece_index, int dest_index, int color)
                     } else {
                         return true;
                     }
-                }
-                else return true;
+                } else return true;
             }
         }
     } else if (trace_clear_line(b, piece_index, found_king, DIAGONAL)) {
         Piece opp_bishop = (color == PGN_WHITE) ? B_BISHOP : W_BISHOP;
         Piece opp_queen  = (color == PGN_WHITE) ? B_QUEEN : W_QUEEN;
         while (piece_index >= 0 && piece_index < 64) {
+            int p_file = (piece_index / 8) + k_to_piece.f_step;
+            int p_rank = (piece_index % 8) + k_to_piece.r_step;
+            if (p_file < 0 || p_file >= 8 || p_rank < 0 || p_rank >= 8) return true;
             piece_index += 8 * k_to_piece.f_step;
             piece_index += k_to_piece.r_step;
             if (piece_index == dest_index) return true;
