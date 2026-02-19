@@ -13,6 +13,7 @@
 #define DARK_SQUARE  (SDL_Color) {76, 86, 113, 255}
 
 typedef enum {
+    CSTL_INVLD_PIECE = -27,
     CSTL_K_NORMAL    = -26,
     CSTL_K_DEST      = -25,
     CSTL_Q_NORMAL    = -24,

@@ -46,7 +46,7 @@ PGN_Error strip_tag_pairs(FILE *f);
 PGN_Error parse_movetext(PGN_Game *g, FILE *f);
 PGN_Error pgn_read_turn(PGN_Turn *t, FILE *f);
 bool file_check_nextc(FILE *f, char c);
-int pgn_read_move(char* buff, int buff_max, FILE *f);
+int pgn_read_move(char *cursor, char* buff, int buff_max, FILE *f);
 PGN_Error pgn_populate_game_turn(PGN_Turn *t, char *buffer, int len, int color_index);
 bool pgn_is_piece(char c);
 bool pgn_is_rank(char c);

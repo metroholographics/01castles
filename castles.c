@@ -211,6 +211,7 @@ input_turn_on_board(Piece* b, PGN_Turn t, int color)
         case 'R': e = handle_rook_move(b, t.piece[color], t.move_to[color], color);   break;
         case 'Q': e = handle_queen_move(b, t.piece[color], t.move_to[color], color);  break;
         case 'K': e = handle_king_move(b, t.move_to[color], color);                   break;
+        default: return cstl_log(CSTL_INVLD_PIECE);
     }
 
     return e;
@@ -246,6 +247,8 @@ cstl_log(CSTL_Error e)
         case CSTL_Q_NORMAL:    printf("ERROR QUEEN MOVE: normal\n");                   break;
         case CSTL_K_DEST:      printf("ERROR KING MOVE: invalid dest index\n");        break;
         case CSTL_K_NORMAL:    printf("ERROR KING MOVE: normal\n");                    break;
+        case CSTL_INVLD_PIECE: printf("ERROR STORING: invalid piece\n");               break;
+
         default:                                                                       break;
     }
 

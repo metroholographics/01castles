@@ -203,7 +203,7 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
     ungetc(c, f);
 
     if (!white_done) {
-        white_len = pgn_read_move(white_move_buffer, 9, f);
+        white_len = pgn_read_move(&c, white_move_buffer, 9, f);
         if (white_move_buffer[white_len-1] == '#') {
             //parse move: checkmate
             pgn_populate_game_turn(t, white_move_buffer, white_len, PGN_WHITE);
@@ -221,8 +221,6 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         }
     }
 
-    //TODO:: 'c' needs to have the updated value after going through the white move - pass
-    // a pointer? or find a way to set the current cursor to the file pos?
     if (c == ' ') {
         while((c = getc(f)) == ' ');
         ungetc(c, f);
@@ -232,7 +230,7 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         while((c = getc(f)) != ' ');
     }
 
-    black_len = pgn_read_move(black_move_buffer, 18, f);
+    black_len = pgn_read_move(&c, black_move_buffer, 18, f);
     if (black_len <= 0) {
         return PGN_ERR_ENDGAME;
     } else {
@@ -243,6 +241,10 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
         }
     }
 
+    if (c == ' ') {
+        while((c = getc(f)) == ' ');
+        ungetc(c, f);
+    }
     if (file_check_nextc(f, '$')) {
         while((c = getc(f)) != ' ');
     }
@@ -264,49 +266,49 @@ pgn_read_turn(PGN_Turn *t, FILE *f)
 }
 
 int
-pgn_read_move(char* buff, int buff_max, FILE* f)
+pgn_read_move(char *cursor, char* buff, int buff_max, FILE* f)
 {
     //TODO: Check for end-move (1-0, 0-1, or 1/2-1/2 instead of EOF?)
-    char c = '\0';
+    *cursor = '\0';
     int i = 0;
     int len = 0;
 
-    while ((c = getc(f)) != ' ' && c != '\r') {
+    while ((*cursor = getc(f)) != ' ' && *cursor != '\r') {
         if (len == buff_max) {
             printf("BUFFER ERROR");
             return len;
         }
-        if (c == EOF) {
+        if (*cursor == EOF) {
             return len;
         }
-        if (c == '{') {
-            while ((c = getc(f)) != '}');
-            c = getc(f);
+        if (*cursor == '{') {
+            while ((*cursor = getc(f)) != '}');
+            *cursor = getc(f);
         }
-        if (c == '(') {
-            while ((c = getc(f)) != ')');
-            c = getc(f);
+        if (*cursor == '(') {
+            while ((*cursor = getc(f)) != ')');
+            *cursor = getc(f);
         }
-        if (c == '.') {
-            while (!pgn_piece_or_rank((c = getc(f))));
+        if (*cursor == '.') {
+            while (!pgn_piece_or_rank((*cursor = getc(f))));
         }
-        if (c == '?' || c == '!') {
-            while ((c = getc(f)) == '?' || c == '!');
+        if (*cursor == '?' || *cursor == '!') {
+            while ((*cursor = getc(f)) == '?' || *cursor == '!');
             break;
         }
-        if (c == ';') {
-            while ((c = getc(f)) != '\n');
-            c = getc(f);
+        if (*cursor == ';') {
+            while ((*cursor = getc(f)) != '\n');
+            *cursor = getc(f);
         }
-        if (c == '\n') {
-            c = getc(f);
+        if (*cursor == '\n') {
+            *cursor = getc(f);
         }
-        if (c != ' '){
-            buff[i++] = c;
+        if (*cursor != ' '){
+            buff[i++] = *cursor;
             len++;
         } else {
-            while ((c = getc(f)) == ' ');
-            ungetc(c, f);
+            while ((*cursor = getc(f)) == ' ');
+            ungetc(*cursor, f);
         }
     }
     return len;
