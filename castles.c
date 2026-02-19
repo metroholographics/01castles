@@ -168,7 +168,7 @@ store_game_in_boards(TurnHistory *th, PGN_Game p)
     CSTL_Error e = CSTL_SUCCESS;
 
     int board_index = 1;
-    for (int i = 0; i < p.num_turns + 1; i++) {
+    for (int i = 0; i <= p.num_turns; i++) {
         PGN_Turn current_turn = p.move_buffer[i];
         copy_board(th->game_turns[board_index], th->game_turns[board_index - 1]);
         if (current_turn.white_move) {
@@ -184,8 +184,8 @@ store_game_in_boards(TurnHistory *th, PGN_Game p)
         board_index++;
     }
     printf("board index: %d\n", board_index);
-    printf("num turns: %d\n", th->num_turns);
-    if (board_index - 1 != th->num_turns) e = CSTL_BAD_STORE;
+    printf("num turns:   %d\n", th->num_turns);
+    if (board_index - 1 != th->num_turns) e = cstl_log(CSTL_BAD_STORE);
 
     return e;
 }
@@ -252,7 +252,6 @@ cstl_log(CSTL_Error e)
         case CSTL_K_NORMAL:    printf("ERROR KING MOVE: normal\n");                    break;
         case CSTL_INVLD_PIECE: printf("ERROR STORING: invalid piece\n");               break;
         case CSTL_BAD_STORE:   printf("ERROR STORING: storing terminated early\n");    break;
-
         default:                                                                       break;
     }
 
@@ -770,6 +769,7 @@ trace_clear_line(Piece *b, int origin_index, int destination_index, LineType lin
     }
 
     while (origin_index != destination_index) {
+        //::TODO:: implement the wrap around fix here
         origin_index += 8 * p_vec.f_step;
         origin_index += p_vec.r_step;
         if (origin_index == destination_index) break;
@@ -873,15 +873,15 @@ initialise_context(Context *c, const char *title, int width, int height, const c
 void
 populate_piece_sprite_array(SDL_FRect *sprite_array)
 {
-    sprite_array[EMPTY]    = (SDL_FRect) {0,    0,          0,          0};
-    sprite_array[W_ROOK]   = (SDL_FRect) {0,    0, BOARD_TILE, BOARD_TILE};
-    sprite_array[W_KNIGHT] = (SDL_FRect) {70,   0, BOARD_TILE, BOARD_TILE};
+    sprite_array[EMPTY]    = (SDL_FRect) {  0,  0,          0,          0};
+    sprite_array[W_ROOK]   = (SDL_FRect) {  0,  0, BOARD_TILE, BOARD_TILE};
+    sprite_array[W_KNIGHT] = (SDL_FRect) { 70,  0, BOARD_TILE, BOARD_TILE};
     sprite_array[W_BISHOP] = (SDL_FRect) {140,  0, BOARD_TILE, BOARD_TILE};
     sprite_array[W_QUEEN]  = (SDL_FRect) {210,  0, BOARD_TILE, BOARD_TILE};
     sprite_array[W_KING]   = (SDL_FRect) {280,  0, BOARD_TILE, BOARD_TILE};
     sprite_array[W_PAWN]   = (SDL_FRect) {350,  0, BOARD_TILE, BOARD_TILE};
-    sprite_array[B_ROOK]   = (SDL_FRect) {0,   70, BOARD_TILE, BOARD_TILE};
-    sprite_array[B_KNIGHT] = (SDL_FRect) {70,  70, BOARD_TILE, BOARD_TILE};
+    sprite_array[B_ROOK]   = (SDL_FRect) {  0, 70, BOARD_TILE, BOARD_TILE};
+    sprite_array[B_KNIGHT] = (SDL_FRect) { 70, 70, BOARD_TILE, BOARD_TILE};
     sprite_array[B_BISHOP] = (SDL_FRect) {140, 70, BOARD_TILE, BOARD_TILE};
     sprite_array[B_QUEEN]  = (SDL_FRect) {210, 70, BOARD_TILE, BOARD_TILE};
     sprite_array[B_KING]   = (SDL_FRect) {280, 70, BOARD_TILE, BOARD_TILE};

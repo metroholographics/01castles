@@ -8,13 +8,13 @@ typedef struct {
 } Test_Game;
 
 Test_Game tests[] = {
-    {"example_pgn/1examplepgn.txt",  36},
-    {"example_pgn/2examplepgn.txt",  30},
-    {"example_pgn/3examplepgn.txt",  42},
-    {"example_pgn/4examplepgn.txt",  61},
-    {"example_pgn/5examplepgn.txt",  98},
-    {"example_pgn/6examplepgn.txt",  50},
-    {"example_pgn/7examplepgn.txt",  199},
+    {"example_pgn/1examplepgn.txt", 36},
+    {"example_pgn/2examplepgn.txt", 30},
+    {"example_pgn/3examplepgn.txt", 42},
+    {"example_pgn/4examplepgn.txt", 61},
+    {"example_pgn/5examplepgn.txt", 98},
+    {"example_pgn/6examplepgn.txt", 50},
+    {"example_pgn/7examplepgn.txt", 199},
     {"example_tests/1.txt",  45},
     {"example_tests/2.txt",  45},
     {"example_tests/3.txt",  46},

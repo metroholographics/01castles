@@ -24,7 +24,8 @@ v0.1
     - [!] run more tests
         - [x] fix pin check - messing with the piece index doesn't work
         - [x] pgn_reader updating 'c'
-        - [~] more info for testing - game length (manual?)
+        - [x] more info for testing - game length (manual?)
+        - [ ] resolve ::TODO::
         - [ ] run more tests
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
