@@ -13,6 +13,7 @@
 #define DARK_SQUARE  (SDL_Color) {76, 86, 113, 255}
 
 typedef enum {
+    CSTL_BAD_STORE   = -28,
     CSTL_INVLD_PIECE = -27,
     CSTL_K_NORMAL    = -26,
     CSTL_K_DEST      = -25,
@@ -85,11 +86,10 @@ void destroy_context(Context *c);
 SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
 void       populate_piece_sprite_array(SDL_FRect *sprite_array);
 
-void initialise_default_board(Piece *p);
+void       initialise_default_board(Piece *p);
+void       copy_board(Piece *target, Piece *source);
 CSTL_Error store_game_in_boards(TurnHistory *th, PGN_Game p);
-void copy_board(Piece *target, Piece *source);
 CSTL_Error input_turn_on_board(Piece* b, PGN_Turn t, int color);
-
 
 bool    is_file(char c);
 bool    is_rank(char c);
@@ -101,13 +101,12 @@ bool    not_pinned(Piece *b, int piece_index, int dest_index, int color);
 PathVec get_path_vector(int from_index, int to_index);
 void    move_piece(Piece *b, int from_index, int dest_index);
 
-
 CSTL_Error cstl_log(CSTL_Error e);
 CSTL_Error handle_castle(Piece *b, char (*piece)[4], char (*destination)[3], int color);
 CSTL_Error handle_promotion(Piece *b, char (*piece)[4], char *destination, char *prom_piece,int color);
 CSTL_Error handle_pawn_move(Piece *b, char *piece, char *destination, int color);
 CSTL_Error handle_knight_move(Piece *b, char *piece, char *destination, int color);
-bool validate_knight_move(int origin_index, int destination_index);
+bool       validate_knight_move(int origin_index, int destination_index);
 CSTL_Error handle_bishop_move(Piece *b, char *piece, char *destination, int color);
 CSTL_Error handle_rook_move(Piece *b, char *piece, char *destination, int color);
 CSTL_Error handle_queen_move(Piece *b, char *piece, char *destination, int color);

@@ -14,7 +14,7 @@ const int FPS           = 30;
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_tests/22.txt";
+const char *PGN_FILEPATH = "example_pgn/7examplepgn.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -184,6 +184,9 @@ store_game_in_boards(TurnHistory *th, PGN_Game p)
         board_index++;
     }
     printf("board index: %d\n", board_index);
+    printf("num turns: %d\n", th->num_turns);
+    if (board_index - 1 != th->num_turns) e = CSTL_BAD_STORE;
+
     return e;
 }
 
@@ -248,6 +251,7 @@ cstl_log(CSTL_Error e)
         case CSTL_K_DEST:      printf("ERROR KING MOVE: invalid dest index\n");        break;
         case CSTL_K_NORMAL:    printf("ERROR KING MOVE: normal\n");                    break;
         case CSTL_INVLD_PIECE: printf("ERROR STORING: invalid piece\n");               break;
+        case CSTL_BAD_STORE:   printf("ERROR STORING: storing terminated early\n");    break;
 
         default:                                                                       break;
     }

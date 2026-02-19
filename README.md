@@ -23,9 +23,9 @@ v0.1
     - [x] stop on error in test
     - [!] run more tests
         - [x] fix pin check - messing with the piece index doesn't work
-        - [~] pgn_reader updating 'c'
-        - [ ] more info for testing - game length (manual?)
-            - game meta-data struct that gets passed to input - 1 per game
+        - [x] pgn_reader updating 'c'
+        - [~] more info for testing - game length (manual?)
+        - [ ] run more tests
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
 - [!] Flip board
