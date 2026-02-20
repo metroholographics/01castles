@@ -14,7 +14,7 @@ const int FPS           = 30;
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_pgn/7examplepgn.txt";
+const char *PGN_FILEPATH = "example_tests/4.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
@@ -769,7 +769,9 @@ trace_clear_line(Piece *b, int origin_index, int destination_index, LineType lin
     }
 
     while (origin_index != destination_index) {
-        //::TODO:: implement the wrap around fix here
+        int p_file = (origin_index / 8) + p_vec.f_step;
+        int p_rank = (origin_index % 8) + p_vec.r_step;
+        if (p_file < 0 || p_file >= 8 || p_rank < 0 || p_rank >= 8) break;
         origin_index += 8 * p_vec.f_step;
         origin_index += p_vec.r_step;
         if (origin_index == destination_index) break;
