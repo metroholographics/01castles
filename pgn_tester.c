@@ -36,7 +36,16 @@ Test_Game tests[] = {
     {"example_tests/19.txt", 28},
     {"example_tests/20.txt", 18},
     {"example_tests/21.txt", 44},
-    {"example_tests/22.txt", 61}
+    {"example_tests/22.txt", 61},
+    {"example_tests/23.txt", 49},
+    {"example_tests/24.txt", 95},
+    {"example_tests/25.txt", 41},
+    {"example_tests/26.txt", 22},
+    {"example_tests/27.txt", 35},
+    {"example_tests/28.txt", 44},
+    {"example_tests/29.txt", 44},
+    {"example_tests/30.txt", 36}
+
 };
 
 
@@ -66,7 +75,9 @@ int main(void)
         TurnHistory g_turn = games[i];
         if (store_game_in_boards(&g_turn, g) != CSTL_SUCCESS) {
             break;
-        };
+        } else {
+            printf("...Test passed\n");
+        }
     }
 
     free(games);

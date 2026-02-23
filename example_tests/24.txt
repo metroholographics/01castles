@@ -1,0 +1,26 @@
+
+[Event "Chennai GM 2024"]
+[Site "Chennai IND"]
+[Date "2024.11.05"]
+[Round "1.3"]
+[White "Vidit,S"]
+[Black "Erigaisi,Arjun"]
+[Result "0-1"]
+[WhiteElo "2739"]
+[BlackElo "2799"]
+[ECO "B40"]
+
+1.e4 c5 2.Nf3 e6 3.c4 Nc6 4.d4 cxd4 5.Nxd4 Nf6 6.Nc3 Bc5 7.Nb3 Bb4 8.Bd3 O-O
+9.O-O Bxc3 10.bxc3 d6 11.Ba3 Re8 12.Re1 Qc7 13.Nd4 a6 14.Nxc6 Qxc6 15.Bc2 Qxc4
+16.Qxd6 e5 17.Bb3 Qxc3 18.Rac1 Qa5 19.Bb4 Qd8 20.Qxd8 Rxd8 21.Rc7 Rd7 22.Rec1 Rxc7
+23.Rxc7 Be6 24.Bxe6 fxe6 25.f3 b5 26.a3 a5 27.Bc3 b4 28.axb4 axb4 29.Bxb4 Ra1+
+30.Kf2 Ra2+ 31.Kf1 Ra1+ 32.Kf2 Ra2+ 33.Kf1 Ra1+ 34.Be1 Nh5 35.g3 Nf6 36.Re7 Ra3
+37.Ke2 Ra6 38.Bc3 Kf8 39.Rb7 Ra2+ 40.Bb2 Nd7 41.Ke3 Ke8 42.h4 Ra5 43.Rc7 g6
+44.g4 h5 45.g5 Ra8 46.Rc6 Kf7 47.Kd3 Rb8 48.Kc2 Ra8 49.Rc7 Ke8 50.Rc6 Kf7
+51.Kc3 Rb8 52.Ba3 Rb1 53.Rc7 Ke8 54.Rc8+ Kf7 55.Rd8 Nb6 56.Rf8+ Kg7 57.Rf6 Na4+
+58.Kc4 Nb6+ 59.Kc3 Na4+ 60.Kc2 Rb6 61.Bf8+ Kh7 62.Bh6 Rb2+ 63.Kd3 Rb7 64.Bf8 Nb2+
+65.Ke2 Rb6 66.Bh6 Rc6 67.Rf7+ Kh8 68.Rf8+ Kh7 69.Rf7+ Kh8 70.Rg7 Rc2+ 71.Ke3 Rc3+
+72.Kd2 Rxf3 73.Rxg6 Nc4+ 74.Kd1 Rf4 75.Rxe6 Ne3+ 76.Kd2 Ng4 77.Kd3 Kg8 78.Re8+ Kh7
+79.Re7+ Kg8 80.Re8+ Kh7 81.Bf8 Nf2+ 82.Kc4 Rxe4+ 83.Kd5 Rxh4 84.Be7 Rg4 85.Ke6 Ne4
+86.Kf5 Ng3+ 87.Kxe5 Kg6 88.Ke6 Re4+ 89.Kd7 Nf5 90.Bd8 Rxe8 91.Kxe8 h4 92.Kd7 h3
+93.Bc7 Kxg5 94.Ke6 Kg4 95.Bh2 Ng3 96.Kf6 Kf3  0-1

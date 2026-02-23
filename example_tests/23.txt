@@ -1,0 +1,18 @@
+[Event "Chennai GM 2024"]
+[Site "Chennai IND"]
+[Date "2024.11.05"]
+[Round "1.2"]
+[White "Vachier Lagrave,M"]
+[Black "Maghsoodloo,Parham"]
+[Result "1-0"]
+[WhiteElo "2737"]
+[BlackElo "2712"]
+[ECO "B41"]
+
+1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 a6 5.Be2 Nf6 6.Nc3 Qc7 7.f4 Bb4 8.e5 Bxc3+
+9.bxc3 Qxc3+ 10.Qd2 Qxd2+ 11.Bxd2 Ne4 12.Bb4 b6 13.Bf3 Bb7 14.Rb1 f5 15.exf6 gxf6
+16.O-O f5 17.Rfd1 h5 18.Be1 b5 19.c4 Nc6 20.cxb5 Nxd4 21.Rxd4 axb5 22.a4 h4
+23.h3 d5 24.Rxb5 Bc6 25.Rb6 Kd7 26.a5 Nd6 27.Be2 Rab8 28.Rxb8 Rxb8 29.Rb4 Ra8
+30.Rb2 Nc4 31.Ra2 Rh8 32.a6 Kc7 33.a7 Nd6 34.Bc3 Ra8 35.Be5 Kd7 36.Ra6 Nc4
+37.Bb8 Ne3 38.Kf2 d4 39.g3 hxg3+ 40.Kxg3 Nd5 41.Bf3 d3 42.Bxd5 Bxd5 43.Kf2 d2
+44.Rd6+ Ke7 45.Rxd5 exd5 46.Ke2 Kf6 47.Kxd2 Kg6 48.Kd3 Kh5 49.Kd4 Kh4 50.Kxd5 Kxh3  1-0

@@ -1,0 +1,18 @@
+[Event "Chennai GM 2024"]
+[Site "Chennai IND"]
+[Date "2024.11.06"]
+[Round "2.3"]
+[White "Maghsoodloo,Parham"]
+[Black "Vidit,S"]
+[Result "1-0"]
+[WhiteElo "2712"]
+[BlackElo "2739"]
+[ECO "C65"]
+
+1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.d3 Bc5 5.Bxc6 dxc6 6.O-O Nd7 7.c3 h6 8.Re1 O-O
+9.Nbd2 Re8 10.Nf1 a5 11.Ng3 a4 12.h3 Nf8 13.Qc2 Qf6 14.Qe2 Ng6 15.Nh5 Qd6
+16.Bd2 Bb6 17.d4 exd4 18.cxd4 f5 19.Ng3 Bd7 20.Qc4+ Be6 21.Qc2 fxe4 22.Rxe4 Bd7
+23.Rae1 Rxe4 24.Rxe4 a3 25.b3 Qf6 26.Qc4+ Qf7 27.h4 Qxc4 28.bxc4 Ra4 29.h5 Nf8
+30.Re7 Rxc4 31.Ne4 Bxd4 32.Nxd4 Rxd4 33.Bc3 Rd1+ 34.Kh2 Ne6 35.Nd2 Nc5 36.Rxg7+ Kf8
+37.Rg3 Ne6 38.Rg6 c5 39.Rxh6 Nd4 40.Ne4 b6 41.Rf6+ Kg8 42.Rg6+ Kh8 43.Nf6 Be6
+44.h6 Bf7 45.Rg7  1-0s

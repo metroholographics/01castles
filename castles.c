@@ -14,7 +14,7 @@ const int FPS           = 30;
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_tests/4.txt";
+const char *PGN_FILEPATH = "example_tests/26.txt";
 
 Context     context                        = {0};
 SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};

@@ -1,0 +1,15 @@
+[Event "Chennai GM 2024"]
+[Site "Chennai IND"]
+[Date "2024.11.06"]
+[Round "2.4"]
+[White "Aravindh,Chithambaram VR."]
+[Black "Vachier Lagrave,M"]
+[Result "1/2-1/2"]
+[WhiteElo "2706"]
+[BlackElo "2737"]
+[ECO "D27"]
+
+1.d4 Nf6 2.Nf3 d5 3.c4 dxc4 4.e3 e6 5.Bxc4 c5 6.O-O a6 7.a4 Nc6 8.Qe2 cxd4
+9.Rd1 Be7 10.exd4 O-O 11.Nc3 Nb4 12.Bg5 h6 13.Bxf6 Bxf6 14.Ne5 Bd7 15.d5 exd5
+16.Nxd5 Nxd5 17.Rxd5 Bxe5 18.Qxe5 Qe8 19.Qd4 Bxa4 20.Re5 Qd7 21.Rd5 Qe8 22.Re5 Qd7
+23.Rd5 Qe8  1/2-1/2

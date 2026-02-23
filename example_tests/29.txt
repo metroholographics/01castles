@@ -1,0 +1,18 @@
+[Event "Chennai GM 2024"]
+[Site "Chennai IND"]
+[Date "2024.11.06"]
+[Round "2.1"]
+[White "Tabatabaei,M"]
+[Black "Sarana,A"]
+[Result "1-0"]
+[WhiteElo "2686"]
+[BlackElo "2679"]
+[ECO "C55"]
+
+1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.d3 Be7 5.O-O O-O 6.Nc3 d6 7.a4 a5 8.Re1 Be6
+9.Nd5 Bxd5 10.exd5 Nb4 11.d4 e4 12.Nd2 c6 13.c3 Nbxd5 14.Nxe4 Nxe4 15.Rxe4 Nf6
+16.Re1 d5 17.Bd3 g6 18.g3 Re8 19.Qf3 Bf8 20.Bg5 Rxe1+ 21.Rxe1 Bg7 22.Qf4 Rc8
+23.Bf1 h6 24.Bxh6 Bxh6 25.Qxh6 Qb6 26.Bh3 Rf8 27.Re6 Nh7 28.Re2 Qb3 29.Qf4 Qxa4
+30.Kg2 c5 31.Bg4 cxd4 32.h4 Qc6 33.Qxd4 Rd8 34.Bf3 b5 35.Re5 Nf6 36.h5 Rd7
+37.hxg6 fxg6 38.g4 Kf7 39.g5 Ne4 40.Bg4 Re7 41.Qxd5+ Qxd5 42.Rxd5 Rc7 43.Rxb5 a4
+44.Bf3 Nc5 45.Bd1  1-0
