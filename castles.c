@@ -11,17 +11,20 @@ const int WINDOW_HEIGHT = 600;
 const int BOARD_SIZE    = 560;
 const int BOARD_TILE    = BOARD_SIZE / 8;
 const int FPS           = 30;
+const int INPUT_WIDTH   = 280;
+const int INPUT_HEIGHT  = 560;
 
 const char *TITLE        = "01castles";
 const char *SPRITESHEET  = "assets/spritesheet.png";
 const char *PGN_FILEPATH = "example_tests/26.txt";
 
-Context     context                        = {0};
-SDL_FRect   piece_sprite_array[NUM_PIECES] = {0};
-PGN_Game    pgn_game                       = {0};
-TurnHistory turn_history                   = {0};
-Piece       *current_board                 = NULL;
-int         current_board_index            = 0;
+Context          context                        = {0};
+SDL_FRect        piece_sprite_array[NUM_PIECES] = {0};
+PGN_Game         pgn_game                       = {0};
+TurnHistory      turn_history                   = {0};
+Piece            *current_board                 = NULL;
+TextureAlignment alignment                      = {0};
+int              current_board_index            = 0;
 
 void
 initialise_default_board(Piece *p)
@@ -69,6 +72,22 @@ main(int argc, char *argv[])
         );
     }
 
+    context.input_texture = SDL_CreateTexture(context.renderer, SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_TARGET, INPUT_WIDTH, INPUT_HEIGHT);
+    if (!context.input_texture) {
+        printf("!!Error: could not create input texture - %s\n", SDL_GetError());
+        destroy_context(&context);
+        return -1;
+    } else {
+        printf("~~created input texture: %dx%d\n",
+            context.input_texture->w, context.input_texture->h
+        );
+    }
+
+    alignment.board_box = (SDL_FRect) {320, 20, BOARD_SIZE, BOARD_SIZE};
+    alignment.input_box = (SDL_FRect) {20, 20, INPUT_WIDTH, INPUT_HEIGHT};
+
+
     populate_piece_sprite_array(piece_sprite_array);
 
     if (pgn_create_game(&pgn_game, PGN_FILEPATH) < 0) {
@@ -92,10 +111,9 @@ main(int argc, char *argv[])
     }
 
     bool running = true;
+    bool trigger_board_refresh = true;
     SDL_Event e;
     while (running) {
-        bool trigger_board_refresh = false;
-        SDL_Color r_c;
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
                 case SDL_EVENT_QUIT:
@@ -118,39 +136,36 @@ main(int argc, char *argv[])
         }
 
         if (trigger_board_refresh) {
+            trigger_board_refresh = false;
             current_board_index = CLAMP_I(current_board_index, 0, turn_history.num_turns);
             current_board       = turn_history.game_turns[current_board_index];
             printf("%d ", current_board_index);
-        }
-        // Draw to board texture
-        SDL_SetRenderTarget(context.renderer, context.board_texture);
-        r_c = CLEAR_COLOR;
-        SDL_SetRenderDrawColor(context.renderer, r_c.r, r_c.g, r_c.b, r_c.a);
-        SDL_RenderClear(context.renderer);
-        for (int c = 7; c >= 0; c--) {
-            for (int f = 0; f < 8; f++) {
-                Piece p = current_board[f * 8 + c];
-                SDL_FRect d = (SDL_FRect){f*BOARD_TILE, (7-c)*BOARD_TILE, BOARD_TILE, BOARD_TILE};
-                SDL_Color sq_c = (((f + c) % 2 == 0 ) ? DARK_SQUARE : LIGHT_SQUARE);
-                // Render board square
-                SDL_SetRenderDrawColor(context.renderer, sq_c.r, sq_c.g, sq_c.b, sq_c.a);
-                SDL_RenderFillRect(context.renderer, &d);
-                // Render piece on board square
-                SDL_RenderTexture(
-                    context.renderer, context.spritesheet,
-                    get_piece_sprite_source(p, piece_sprite_array),
-                    &d
-                );
+            // Draw to board texture
+            clear_texture(context.renderer, context.board_texture, CLEAR_COLOR);
+            for (int c = 7; c >= 0; c--) {
+                for (int f = 0; f < 8; f++) {
+                    Piece p = current_board[f * 8 + c];
+                    SDL_FRect d = (SDL_FRect){f*BOARD_TILE, (7-c)*BOARD_TILE, BOARD_TILE, BOARD_TILE};
+                    SDL_Color sq_c = (((f + c) % 2 == 0 ) ? DARK_SQUARE : LIGHT_SQUARE);
+                    // Render board square
+                    SDL_SetRenderDrawColor(context.renderer, sq_c.r, sq_c.g, sq_c.b, sq_c.a);
+                    SDL_RenderFillRect(context.renderer, &d);
+                    // Render piece on board square
+                    SDL_RenderTexture(
+                        context.renderer, context.spritesheet,
+                        get_piece_sprite_source(p, piece_sprite_array),
+                        &d
+                    );
+                }
             }
         }
-        // Draw to window
-        SDL_SetRenderTarget(context.renderer, NULL);
-        r_c = CLEAR_COLOR;
-        SDL_SetRenderDrawColor(context.renderer, r_c.r, r_c.g, r_c.b, r_c.a);
-        SDL_RenderClear(context.renderer);
-        SDL_FRect board_tex = (SDL_FRect){320, 20, BOARD_SIZE, BOARD_SIZE};
-        SDL_RenderTexture(context.renderer, context.board_texture, NULL, &board_tex);
+        // Draw to input texture
+        clear_texture(context.renderer, context.input_texture, (SDL_Color) {10, 10, 10, 255});
 
+        // Draw to window
+        clear_texture(context.renderer, NULL, CLEAR_COLOR);
+        SDL_RenderTexture(context.renderer, context.board_texture, NULL, &alignment.board_box);
+        SDL_RenderTexture(context.renderer, context.input_texture, NULL, &alignment.input_box);
         SDL_RenderPresent(context.renderer);
 
         SDL_Delay(1000/FPS);
@@ -159,6 +174,15 @@ main(int argc, char *argv[])
     destroy_context(&context);
     return 0;
 }
+
+void
+clear_texture(SDL_Renderer *r, SDL_Texture *t, SDL_Color c)
+{
+    SDL_SetRenderTarget(r, t);
+    SDL_SetRenderDrawColor(context.renderer, c.r, c.g, c.b, c.a);
+    SDL_RenderClear(r);
+}
+
 
 CSTL_Error
 store_game_in_boards(TurnHistory *th, PGN_Game p)
@@ -893,6 +917,10 @@ populate_piece_sprite_array(SDL_FRect *sprite_array)
 void
 destroy_context(Context *c)
 {
+    if (c->input_texture) {
+        SDL_DestroyTexture(c->input_texture);
+        printf("**destroyed input texture...\n");
+    }
     if (c->board_texture) {
         SDL_DestroyTexture(c->board_texture);
         printf("**destroyed board texture...\n");

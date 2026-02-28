@@ -72,20 +72,27 @@ typedef struct {
 } TurnHistory;
 
 typedef struct {
+    SDL_FRect board_box;
+    SDL_FRect input_box;
+} TextureAlignment;
+
+
+typedef struct {
     SDL_Window   *window;
     SDL_Renderer *renderer;
     SDL_Texture  *spritesheet;
     SDL_Texture  *board_texture;
+    SDL_Texture  *input_texture;
 } Context;
-
 
 bool initialise_context(Context *c, const char *title, int width, int height,
     const char *spritesheet);
 void destroy_context(Context *c);
 
+void clear_texture(SDL_Renderer *r, SDL_Texture *t, SDL_Color c);
+
 SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
 void       populate_piece_sprite_array(SDL_FRect *sprite_array);
-
 void       initialise_default_board(Piece *p);
 void       copy_board(Piece *target, Piece *source);
 CSTL_Error store_game_in_boards(TurnHistory *th, PGN_Game p);

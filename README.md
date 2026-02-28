@@ -17,23 +17,14 @@ v0.1
 - [x] Render default game state
 - [x] Parse PGN movetext
 - [x] Step through move history on board
-- [!] Mass PGN tester
-    - [x] test environment
-    - [x] castles error handling
-    - [x] stop on error in test
-    - [!] run more tests
-        - [x] fix pin check - messing with the piece index doesn't work
-        - [x] pgn_reader updating 'c'
-        - [x] more info for testing - game length (manual?)
-        - [x] resolve ::TODO::
-        - [~] run more tests
+- [x] Mass PGN tester
+- [!] On-screen text box to paste pgn data
+    - [~] Render input texture
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
 - [!] Flip board
     - [ ] Make this more generic
-- [ ] Cleanup A - assert macro?
 - [ ] Game effects
-- [ ] On-screen text box to paste pgn data
 - [ ] Better PGN error handling
 - [ ] Return error codes and stop input
 
