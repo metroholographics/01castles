@@ -2,6 +2,7 @@
 #define CASTLES_H
 
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include "pgn_reader.h"
 
 #define ARRAY_SIZE(a)      ((int)((sizeof((a))) / (sizeof((a)[0]))))
@@ -75,6 +76,7 @@ typedef struct {
 typedef struct {
     SDL_FRect board_box;
     SDL_FRect input_box;
+    SDL_FRect text_area;
 } TextureAlignment;
 
 typedef struct {
@@ -89,11 +91,13 @@ typedef struct {
     SDL_Texture  *spritesheet;
     SDL_Texture  *board_texture;
     SDL_Texture  *input_texture;
+    SDL_Texture  *text_texture;
+    TTF_Font     *font;
     char         *game_text;
 } Context;
 
 bool initialise_context(Context *c, const char *title, int width, int height,
-    const char *spritesheet);
+    const char *spritesheet, const char *fontpath, int font_size);
 void destroy_context(Context *c);
 
 void clear_texture(SDL_Renderer *r, SDL_Texture *t, SDL_Color c);
@@ -129,3 +133,4 @@ CSTL_Error handle_queen_move(Piece *b, char *piece, char *destination, int color
 CSTL_Error handle_king_move(Piece *b, char *destination, int color);
 
 #endif
+

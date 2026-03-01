@@ -3,21 +3,24 @@
 #include <stdlib.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include "castles.h"
 
 #define DEBUG 1
 
 const int WINDOW_WIDTH  = 900;
 const int WINDOW_HEIGHT = 600;
+const int FONT_SIZE     = 18; 
 const int BOARD_SIZE    = 560;
 const int BOARD_TILE    = BOARD_SIZE / 8;
 const int FPS           = 30;
 const int INPUT_WIDTH   = 280;
 const int INPUT_HEIGHT  = 560;
 
-const char *TITLE        = "01castles";
-const char *SPRITESHEET  = "assets/spritesheet.png";
-const char *PGN_FILEPATH = "example_tests/26.txt";
+const char *TITLE       = "01castles";
+const char *SPRITESHEET = "assets/spritesheet.png";
+const char *PGN_PATH    = "example_tests/26.txt";
+const char *FONT_PATH   = "assets/D2Coding.ttf";
 
 Context          context                        = {0};
 SDL_FRect        piece_sprite_array[NUM_PIECES] = {0};
@@ -56,7 +59,8 @@ main(int argc, char *argv[])
 {
     (void)argc;(void)argv;
 
-    if (!initialise_context(&context, TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, SPRITESHEET)) {
+    if (!initialise_context(&context, TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, SPRITESHEET,
+        FONT_PATH, FONT_SIZE)) {
         destroy_context(&context);
         return -1;
     }
@@ -72,7 +76,6 @@ main(int argc, char *argv[])
             context.board_texture->w, context.board_texture->h
         );
     }
-
     context.input_texture = SDL_CreateTexture(context.renderer, SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET, INPUT_WIDTH, INPUT_HEIGHT);
     if (!context.input_texture) {
@@ -88,10 +91,9 @@ main(int argc, char *argv[])
     alignment.board_box = (SDL_FRect) {320, 20, BOARD_SIZE, BOARD_SIZE};
     alignment.input_box = (SDL_FRect) {20, 20, INPUT_WIDTH, INPUT_HEIGHT};
 
-
     populate_piece_sprite_array(piece_sprite_array);
 
-    if (pgn_create_game(&pgn_game, PGN_FILEPATH) < 0) {
+    if (pgn_create_game(&pgn_game, PGN_PATH) < 0) {
         printf("!!Error: could not parse provided PGN\n");
         destroy_context(&context);
         return -1;
@@ -148,21 +150,52 @@ main(int argc, char *argv[])
         }
 
         if (handle_mouse) {
-            if (pos_in_box(mouse_info.x, mouse_info.y, alignment.input_box) && mouse_info.button  == 3) {
+            if (pos_in_box(mouse_info.x, mouse_info.y, alignment.input_box) &&
+                mouse_info.button  == 3) {
                 char *c = SDL_GetClipboardText();
                 FILE *session_pgn = fopen("bin/session_pgn.txt", "wb+");
                 if (!session_pgn) {
                     cstl_log(CSTL_PASTE_ERR);
+                    break;
                 }
                 fprintf(session_pgn, "%s", c);
                 if (context.game_text) {
                     printf("...free'd existing game text\n");
                     free(context.game_text);
+                    context.game_text = NULL;
                 }
-                context.game_text = (char *) malloc(ftell(session_pgn) + 1);
+                size_t pgn_len = ftell(session_pgn);
+                context.game_text = (char *) malloc(pgn_len + 1);
                 sprintf(context.game_text, "%s", c);
                 fclose(session_pgn);
 
+                int end_brace = 0;
+                for (size_t i = 0; i < pgn_len + 1; i++) {
+                    if (context.game_text[i] == ']') end_brace = i + 1;
+                }
+
+                char *start_text = &context.game_text[end_brace];
+                while (*start_text != '1'){start_text++; pgn_len--;}
+                SDL_Surface *s = TTF_RenderText_Shaded_Wrapped(
+                    context.font, start_text, pgn_len - end_brace, CLEAR_COLOR, 
+                    (SDL_Color) {20,20,20,255}, 
+                    alignment.input_box.w
+                );
+                if (!s) {
+                    printf("!!Error: could not create paste text surface\n");
+                    break;
+                }
+                if (context.text_texture) {
+                    SDL_DestroyTexture(context.text_texture);
+                    context.text_texture = NULL;
+                }
+                context.text_texture = SDL_CreateTextureFromSurface(context.renderer, s);
+                SDL_DestroySurface(s);
+                if (!context.text_texture) {
+                    printf("!!Error: could not create paste text texture\n");
+                    break;
+                }
+                
                 memset(&pgn_game, 0, sizeof(pgn_game));
                 memset(&turn_history, 0, sizeof(turn_history));
                 current_board_index = 0;
@@ -205,10 +238,33 @@ main(int argc, char *argv[])
         // Draw to input texture
         clear_texture(context.renderer, context.input_texture, (SDL_Color) {30, 30, 30, 255});
 
+        
+        float w = 0; float h = 0;
+        SDL_GetTextureSize(context.text_texture, &w, &h);
+        SDL_FRect input_alignment = (SDL_FRect) {
+            .x = 0,
+            .y = 0,
+            .w = w
+        };
+        //TODO:: clamp smaller heights to the texture height
+        input_alignment.h = (input_alignment.y + 560 >= h) ? h : input_alignment.y + 560;
+
+        SDL_FRect input_dest = (SDL_FRect) {
+            .x = alignment.input_box.x,
+            .y = alignment.input_box.y,
+            .w = alignment.input_box.w,
+            .h = input_alignment.h
+        };
+
         // Draw to window
         clear_texture(context.renderer, NULL, CLEAR_COLOR);
         SDL_RenderTexture(context.renderer, context.board_texture, NULL, &alignment.board_box);
         SDL_RenderTexture(context.renderer, context.input_texture, NULL, &alignment.input_box);
+        if (context.text_texture){
+            SDL_RenderTexture(context.renderer, context.text_texture, &input_alignment, 
+                &input_dest);
+        }
+            
         SDL_RenderPresent(context.renderer);
 
         SDL_Delay(1000/FPS);
@@ -907,18 +963,37 @@ copy_board(Piece *target, Piece *source)
 }
 
 bool
-initialise_context(Context *c, const char *title, int width, int height, const char* spritesheet)
+initialise_context(Context *c, const char *title, int width, int height, const char* spritesheet, 
+    const char *fontpath, int font_size)
 {
     c->window        = NULL;
     c->renderer      = NULL;
     c->spritesheet   = NULL;
     c->board_texture = NULL;
+    c->input_texture = NULL;
+    c->text_texture  = NULL;
+    c->font          = NULL;
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         printf("!!Error: could not initialise SDL - %s\n", SDL_GetError());
         return false;
     } else {
         printf("~~SDL initialised\n");
+    }
+
+    if (!TTF_Init()) {
+        printf("!!Error: could not initialise TTF - %s\n", SDL_GetError());
+        return false;
+    } else {
+        printf("~~TTF initialised\n");
+    }
+
+    c->font = TTF_OpenFont(fontpath, font_size);
+    if (!c->font) {
+        printf("!!Error: could not load font - %s\n", SDL_GetError());
+        return false;
+    } else {
+        printf("~~loaded font: %s\n", fontpath);
     }
 
     c->window = SDL_CreateWindow(title, width, height, 0);
@@ -969,9 +1044,18 @@ populate_piece_sprite_array(SDL_FRect *sprite_array)
 void
 destroy_context(Context *c)
 {
+    if (c->font) {
+        TTF_CloseFont(c->font);
+        printf("**destroyed font...\n");
+    }
     if (c->game_text) {
         free(c->game_text);
         printf("**destroyed game text buffer...\n");
+    }
+    if (c->text_texture) {
+        SDL_DestroyTexture(c->text_texture);
+        printf("**destroyed text texture...\n");
+
     }
     if (c->input_texture) {
         SDL_DestroyTexture(c->input_texture);
@@ -993,6 +1077,8 @@ destroy_context(Context *c)
         SDL_DestroyWindow(c->window);
         printf("**destroyed window...\n");
     }
+    TTF_Quit();
+    printf("**TTF de-initialized...\n");
     SDL_Quit();
     printf("**SDL de-initialized...\n");
 }

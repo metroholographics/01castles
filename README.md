@@ -21,8 +21,11 @@ v0.1
 - [!] On-screen text box to paste pgn data
     - [x] Render input texture
     - [!] Paste clipboard to box
-        - [~] Register paste and create new game
-        - [ ] Display game text on screen
+        - [x] Register paste and create new game
+        - [!] Display game text on screen
+            - [~] Paste text 
+            - [ ] Add scroll
+            - [ ] Tidy
         - [ ] Make game not crash on bad paste
 - [!] Strip variations from PGN_Reader
     - [ ] test this more

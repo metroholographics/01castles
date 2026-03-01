@@ -3,7 +3,7 @@ C_FLAGS = -Wall -Wextra -Wpedantic -std=c99 -g
 C_FILES = castles.c pgn_reader.c
 EXE = main
 EXE_WSL = linux/main_wsl
-LINK_FLAGS = -lSDL3 -lSDL3_image
+LINK_FLAGS = -lSDL3 -lSDL3_image -lSDL3_ttf
 
 all:
 	$(CC) $(C_FLAGS) $(C_FILES) -o $(EXE) $(LINK_FLAGS)
