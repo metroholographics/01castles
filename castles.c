@@ -238,22 +238,22 @@ main(int argc, char *argv[])
         // Draw to input texture
         clear_texture(context.renderer, context.input_texture, (SDL_Color) {30, 30, 30, 255});
 
-        
+
         float w = 0; float h = 0;
         SDL_GetTextureSize(context.text_texture, &w, &h);
-        SDL_FRect input_alignment = (SDL_FRect) {
+        SDL_FRect input_source = (SDL_FRect) {
             .x = 0,
             .y = 0,
             .w = w
         };
         //TODO:: clamp smaller heights to the texture height
-        input_alignment.h = (input_alignment.y + 560 >= h) ? h : input_alignment.y + 560;
+        input_source.h = (input_source.y + 560 >= h) ? h : input_source.y + 560;
 
         SDL_FRect input_dest = (SDL_FRect) {
             .x = alignment.input_box.x,
             .y = alignment.input_box.y,
             .w = alignment.input_box.w,
-            .h = input_alignment.h
+            .h = input_source.h
         };
 
         // Draw to window
@@ -261,7 +261,7 @@ main(int argc, char *argv[])
         SDL_RenderTexture(context.renderer, context.board_texture, NULL, &alignment.board_box);
         SDL_RenderTexture(context.renderer, context.input_texture, NULL, &alignment.input_box);
         if (context.text_texture){
-            SDL_RenderTexture(context.renderer, context.text_texture, &input_alignment, 
+            SDL_RenderTexture(context.renderer, context.text_texture, &input_source, 
                 &input_dest);
         }
             
