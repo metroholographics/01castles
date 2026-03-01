@@ -19,7 +19,11 @@ v0.1
 - [x] Step through move history on board
 - [x] Mass PGN tester
 - [!] On-screen text box to paste pgn data
-    - [~] Render input texture
+    - [x] Render input texture
+    - [!] Paste clipboard to box
+        - [~] Register paste and create new game
+        - [ ] Display game text on screen
+        - [ ] Make game not crash on bad paste
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
 - [!] Flip board

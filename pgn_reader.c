@@ -347,7 +347,8 @@ strip_tag_pairs(FILE *f)
         }
     }
     fsetpos(f, &indicator);
-    while ((c1 = getc(f)) != '1');
+    while ((c1 = getc(f)) != '1' && c1 != EOF);
+    if (c1 == EOF) return PGN_ERR_STRIP_TAG;
     ungetc(c1, f);
     return PGN_SUCCESS;
 }

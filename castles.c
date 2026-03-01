@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
 #include "castles.h"
@@ -112,8 +113,12 @@ main(int argc, char *argv[])
 
     bool running = true;
     bool trigger_board_refresh = true;
+    MouseInfo mouse_info = {0};
+    bool handle_mouse = false;
     SDL_Event e;
     while (running) {
+        handle_mouse = false;
+        mouse_info = (MouseInfo) {0};
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
                 case SDL_EVENT_QUIT:
@@ -130,8 +135,46 @@ main(int argc, char *argv[])
                         trigger_board_refresh = true;
                         current_board_index = 0;
                     }
+                    break;
+                case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                    handle_mouse = true;
+                    mouse_info.x = e.button.x;
+                    mouse_info.y = e.button.y;
+                    mouse_info.button = e.button.button;
+                    break;
                 default:
                     break;
+            }
+        }
+
+        if (handle_mouse) {
+            if (pos_in_box(mouse_info.x, mouse_info.y, alignment.input_box) && mouse_info.button  == 3) {
+                char *c = SDL_GetClipboardText();
+                FILE *session_pgn = fopen("bin/session_pgn.txt", "wb+");
+                if (!session_pgn) {
+                    cstl_log(CSTL_PASTE_ERR);
+                }
+                fprintf(session_pgn, "%s", c);
+                if (context.game_text) {
+                    printf("...free'd existing game text\n");
+                    free(context.game_text);
+                }
+                context.game_text = (char *) malloc(ftell(session_pgn) + 1);
+                sprintf(context.game_text, "%s", c);
+                fclose(session_pgn);
+
+                memset(&pgn_game, 0, sizeof(pgn_game));
+                memset(&turn_history, 0, sizeof(turn_history));
+                current_board_index = 0;
+                trigger_board_refresh = true;
+                if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
+                    printf("!!Error: could not parse provided PGN\n");
+                    destroy_context(&context);
+                    return -1;
+                } else {
+                    printf("...Congrats, PGN parsed\n");
+                }
+                store_game_in_boards(&turn_history, pgn_game);
             }
         }
 
@@ -160,7 +203,7 @@ main(int argc, char *argv[])
             }
         }
         // Draw to input texture
-        clear_texture(context.renderer, context.input_texture, (SDL_Color) {10, 10, 10, 255});
+        clear_texture(context.renderer, context.input_texture, (SDL_Color) {30, 30, 30, 255});
 
         // Draw to window
         clear_texture(context.renderer, NULL, CLEAR_COLOR);
@@ -173,6 +216,14 @@ main(int argc, char *argv[])
 
     destroy_context(&context);
     return 0;
+}
+
+
+
+
+bool pos_in_box(float x, float y, SDL_FRect r)
+{
+    return (x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
 }
 
 void
@@ -276,6 +327,7 @@ cstl_log(CSTL_Error e)
         case CSTL_K_NORMAL:    printf("ERROR KING MOVE: normal\n");                    break;
         case CSTL_INVLD_PIECE: printf("ERROR STORING: invalid piece\n");               break;
         case CSTL_BAD_STORE:   printf("ERROR STORING: storing terminated early\n");    break;
+        case CSTL_PASTE_ERR:   printf("ERROR PASTE: couldn't create session file\n");  break;
         default:                                                                       break;
     }
 
@@ -917,6 +969,10 @@ populate_piece_sprite_array(SDL_FRect *sprite_array)
 void
 destroy_context(Context *c)
 {
+    if (c->game_text) {
+        free(c->game_text);
+        printf("**destroyed game text buffer...\n");
+    }
     if (c->input_texture) {
         SDL_DestroyTexture(c->input_texture);
         printf("**destroyed input texture...\n");

@@ -13,6 +13,7 @@
 #define DARK_SQUARE  (SDL_Color) {76, 86, 113, 255}
 
 typedef enum {
+    CSTL_PASTE_ERR   = -29,
     CSTL_BAD_STORE   = -28,
     CSTL_INVLD_PIECE = -27,
     CSTL_K_NORMAL    = -26,
@@ -76,6 +77,11 @@ typedef struct {
     SDL_FRect input_box;
 } TextureAlignment;
 
+typedef struct {
+    float x;
+    float y;
+    int button;
+} MouseInfo;
 
 typedef struct {
     SDL_Window   *window;
@@ -83,6 +89,7 @@ typedef struct {
     SDL_Texture  *spritesheet;
     SDL_Texture  *board_texture;
     SDL_Texture  *input_texture;
+    char         *game_text;
 } Context;
 
 bool initialise_context(Context *c, const char *title, int width, int height,
@@ -90,6 +97,8 @@ bool initialise_context(Context *c, const char *title, int width, int height,
 void destroy_context(Context *c);
 
 void clear_texture(SDL_Renderer *r, SDL_Texture *t, SDL_Color c);
+bool pos_in_box(float x, float y, SDL_FRect r);
+
 
 SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
 void       populate_piece_sprite_array(SDL_FRect *sprite_array);
