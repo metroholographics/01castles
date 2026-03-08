@@ -170,7 +170,6 @@ main(int argc, char *argv[])
 
                     memset(&pgn_game, 0, sizeof(pgn_game));
                     memset(&turn_history, 0, sizeof(turn_history));
-                    current_board_index = 0;
                     bool valid_pgn = false;
                     if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
                         printf("!!Error: could not parse provided PGN\n");
@@ -178,6 +177,7 @@ main(int argc, char *argv[])
                         printf("...Congrats, PGN parsed\n");
                         valid_pgn = true;
                     }
+                    current_board_index = 0;
                     store_game_in_boards(&turn_history, pgn_game);
                     trigger_board_refresh = true;
 
@@ -190,8 +190,8 @@ main(int argc, char *argv[])
                     int text_start = 0;
                     char* start_text;
                     if (!valid_pgn) {
-                        context.game_text = (char *) malloc(sizeof("Error: Invalid pgn"));
-                        sprintf(context.game_text, "Error: Invalid pgn");
+                        context.game_text = (char *) malloc(sizeof("Error: Invalid PGN"));
+                        sprintf(context.game_text, "Error: Invalid PGN");
                         start_text = &context.game_text[0];
                     } else {
                         context.game_text = (char *) malloc(pgn_len + 1);
@@ -241,7 +241,7 @@ main(int argc, char *argv[])
                     };
 
                     end_paste_text:
-                        SDL_free(c);
+                    SDL_free(c);
                 }
 
                 if (mouse_info.scroll_d != 0) {
