@@ -165,25 +165,45 @@ main(int argc, char *argv[])
                         goto end_paste_text;
                     }
                     fprintf(session_pgn, "%s", c);
+                    size_t pgn_len = ftell(session_pgn);
+                    fclose(session_pgn);
+
+                    memset(&pgn_game, 0, sizeof(pgn_game));
+                    memset(&turn_history, 0, sizeof(turn_history));
+                    current_board_index = 0;
+                    bool valid_pgn = false;
+                    if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
+                        printf("!!Error: could not parse provided PGN\n");
+                    } else {
+                        printf("...Congrats, PGN parsed\n");
+                        valid_pgn = true;
+                    }
+                    store_game_in_boards(&turn_history, pgn_game);
+                    trigger_board_refresh = true;
+
                     if (context.game_text) {
                         printf("...free'd existing game text\n");
                         free(context.game_text);
                         context.game_text = NULL;
                     }
-                    size_t pgn_len = ftell(session_pgn);
-                    context.game_text = (char *) malloc(pgn_len + 1);
-                    sprintf(context.game_text, "%s", c);
-                    context.game_text[pgn_len] = '\0';
-                    fclose(session_pgn);
-                    SDL_free(c);
-    
-                    int end_brace = 0;
-                    for (size_t i = 0; i < pgn_len + 1; i++) {
-                        if (context.game_text[i] == ']') end_brace = i + 1;
-                    }
 
-                    char *start_text = &context.game_text[end_brace];
-                    while (*start_text != '1'){start_text++; pgn_len--;}
+                    int text_start = 0;
+                    char* start_text;
+                    if (!valid_pgn) {
+                        context.game_text = (char *) malloc(sizeof("Error: Invalid pgn"));
+                        sprintf(context.game_text, "Error: Invalid pgn");
+                        start_text = &context.game_text[0];
+                    } else {
+                        context.game_text = (char *) malloc(pgn_len + 1);
+                        sprintf(context.game_text, "%s", c);
+                        context.game_text[pgn_len] = '\0';
+                        for (size_t i = 0; i < pgn_len + 1; i++) {
+                            if (context.game_text[i] == ']') text_start = i + 1;
+                        }
+                        start_text = &context.game_text[text_start];
+                        while (*start_text != '1'){start_text++; pgn_len--;}
+                    }
+                    
                     SDL_Surface *s = NULL;
                     
                     for (char *p = start_text; *p; p++) {
@@ -220,20 +240,8 @@ main(int argc, char *argv[])
                         .h = h
                     };
 
-                    memset(&pgn_game, 0, sizeof(pgn_game));
-                    memset(&turn_history, 0, sizeof(turn_history));
-                    current_board_index = 0;
-                    if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
-                        printf("!!Error: could not parse provided PGN\n");
-                        destroy_context(&context);
-                        return -1;
-                    } else {
-                        printf("...Congrats, PGN parsed\n");
-                    }
-                    store_game_in_boards(&turn_history, pgn_game);
-                    trigger_board_refresh = true;
-                    
                     end_paste_text:
+                        SDL_free(c);
                 }
 
                 if (mouse_info.scroll_d != 0) {
