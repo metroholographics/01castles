@@ -24,7 +24,7 @@ v0.1
         - [x] Register paste and create new game
         - [!] Display game text on screen
             - [x] Paste text 
-            - [ ] Add scroll
+            - [~] Add scroll
             - [ ] Make game not crash on bad paste
             - [ ] Tidy
 - [!] Strip variations from PGN_Reader

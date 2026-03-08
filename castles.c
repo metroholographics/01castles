@@ -182,13 +182,12 @@ main(int argc, char *argv[])
                         if (context.game_text[i] == ']') end_brace = i + 1;
                     }
 
-                    
                     char *start_text = &context.game_text[end_brace];
                     while (*start_text != '1'){start_text++; pgn_len--;}
                     SDL_Surface *s = NULL;
                     
                     for (char *p = start_text; *p; p++) {
-                        if ((unsigned char)*p < 32 && *p != '\n' && *p != '\t')
+                        if ((unsigned char)*p < 32)
                             *p = ' ';
                     }
                     // size_t len = strlen(start_text);
@@ -238,11 +237,10 @@ main(int argc, char *argv[])
                 }
 
                 if (mouse_info.scroll_d != 0) {
-                    printf("%f\n", mouse_info.scroll_d);
-                    if (alignment.text_area.y + 560 < alignment.text_area.h || 
-                        alignment.text_area.y > 0) {
-                            alignment.text_area.y += -mouse_info.scroll_d * 5;
-                            alignment.text_area.y = (float)CLAMP_I((int)alignment.text_area.y, 0, 560);
+                    if (alignment.text_area.y + 560 <= alignment.text_area.h) {
+                            alignment.text_area.y += -mouse_info.scroll_d * FONT_SIZE;
+                            alignment.text_area.y = (float)CLAMP_I((int)alignment.text_area.y, 0, 
+                            alignment.text_area.h - 560);
                     }
                 }
             }
@@ -275,10 +273,10 @@ main(int argc, char *argv[])
         // Draw to input texture
         clear_texture(context.renderer, context.input_texture, (SDL_Color) {30, 30, 30, 255});
 
-
         SDL_FRect input_source = alignment.text_area;
         input_source.h = ((input_source.y + 560 >= alignment.text_area.h) ? 
-            alignment.text_area.h : 560 - input_source.y);
+            alignment.text_area.h - input_source.y : 560);
+
 
         SDL_FRect input_dest = (SDL_FRect) {
             .x = alignment.input_box.x,
