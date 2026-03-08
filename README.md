@@ -23,10 +23,10 @@ v0.1
     - [!] Paste clipboard to box
         - [x] Register paste and create new game
         - [!] Display game text on screen
-            - [~] Paste text 
+            - [x] Paste text 
             - [ ] Add scroll
+            - [ ] Make game not crash on bad paste
             - [ ] Tidy
-        - [ ] Make game not crash on bad paste
 - [!] Strip variations from PGN_Reader
     - [ ] test this more
 - [!] Flip board

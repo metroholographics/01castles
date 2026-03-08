@@ -82,6 +82,7 @@ typedef struct {
 typedef struct {
     float x;
     float y;
+    float scroll_d;
     int button;
 } MouseInfo;
 

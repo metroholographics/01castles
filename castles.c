@@ -20,7 +20,8 @@ const int INPUT_HEIGHT  = 560;
 const char *TITLE       = "01castles";
 const char *SPRITESHEET = "assets/spritesheet.png";
 const char *PGN_PATH    = "example_tests/26.txt";
-const char *FONT_PATH   = "assets/D2Coding.ttf";
+// const char *FONT_PATH   = "assets/D2Coding.ttf";
+const char *FONT_PATH   = "assets/AcPlus_IBM_CGA.ttf";
 
 Context          context                        = {0};
 SDL_FRect        piece_sprite_array[NUM_PIECES] = {0};
@@ -144,70 +145,106 @@ main(int argc, char *argv[])
                     mouse_info.y = e.button.y;
                     mouse_info.button = e.button.button;
                     break;
+                case SDL_EVENT_MOUSE_WHEEL:
+                    handle_mouse = true;
+                    mouse_info.x = e.wheel.mouse_x;
+                    mouse_info.y = e.wheel.mouse_y;
+                    mouse_info.scroll_d = e.wheel.y;
                 default:
                     break;
             }
         }
 
         if (handle_mouse) {
-            if (pos_in_box(mouse_info.x, mouse_info.y, alignment.input_box) &&
-                mouse_info.button  == 3) {
-                char *c = SDL_GetClipboardText();
-                FILE *session_pgn = fopen("bin/session_pgn.txt", "wb+");
-                if (!session_pgn) {
-                    cstl_log(CSTL_PASTE_ERR);
-                    break;
-                }
-                fprintf(session_pgn, "%s", c);
-                if (context.game_text) {
-                    printf("...free'd existing game text\n");
-                    free(context.game_text);
-                    context.game_text = NULL;
-                }
-                size_t pgn_len = ftell(session_pgn);
-                context.game_text = (char *) malloc(pgn_len + 1);
-                sprintf(context.game_text, "%s", c);
-                fclose(session_pgn);
+            if (pos_in_box(mouse_info.x, mouse_info.y, alignment.input_box)) {
+                if (mouse_info.button == 3) {
+                    char *c = SDL_GetClipboardText();
+                    FILE *session_pgn = fopen("bin/session_pgn.txt", "wb+");
+                    if (!session_pgn) {
+                        cstl_log(CSTL_PASTE_ERR);
+                        goto end_paste_text;
+                    }
+                    fprintf(session_pgn, "%s", c);
+                    if (context.game_text) {
+                        printf("...free'd existing game text\n");
+                        free(context.game_text);
+                        context.game_text = NULL;
+                    }
+                    size_t pgn_len = ftell(session_pgn);
+                    context.game_text = (char *) malloc(pgn_len + 1);
+                    sprintf(context.game_text, "%s", c);
+                    context.game_text[pgn_len] = '\0';
+                    fclose(session_pgn);
+                    SDL_free(c);
+    
+                    int end_brace = 0;
+                    for (size_t i = 0; i < pgn_len + 1; i++) {
+                        if (context.game_text[i] == ']') end_brace = i + 1;
+                    }
 
-                int end_brace = 0;
-                for (size_t i = 0; i < pgn_len + 1; i++) {
-                    if (context.game_text[i] == ']') end_brace = i + 1;
+                    
+                    char *start_text = &context.game_text[end_brace];
+                    while (*start_text != '1'){start_text++; pgn_len--;}
+                    SDL_Surface *s = NULL;
+                    
+                    for (char *p = start_text; *p; p++) {
+                        if ((unsigned char)*p < 32 && *p != '\n' && *p != '\t')
+                            *p = ' ';
+                    }
+                    // size_t len = strlen(start_text);
+                    s = TTF_RenderText_Shaded_Wrapped(
+                        context.font, start_text, 0,
+                        CLEAR_COLOR, (SDL_Color) {10,10,10,255}, 
+                        (int)alignment.input_box.w
+                    );
+                    if (!s) {
+                        printf("!!Error: could not create paste text surface\n");
+                        goto end_paste_text;
+                    }
+                    if (context.text_texture) {
+                        SDL_DestroyTexture(context.text_texture);
+                        context.text_texture = NULL;
+                    }
+                    context.text_texture = SDL_CreateTextureFromSurface(context.renderer, s);
+                    SDL_DestroySurface(s);
+                    if (!context.text_texture) {
+                        printf("!!Error: could not create paste text texture\n");
+                        goto end_paste_text;
+                    }
+                    float w = 0; float h = 0;
+                    SDL_GetTextureSize(context.text_texture, &w, &h);
+
+                    alignment.text_area = (SDL_FRect) {
+                        .x = 0,
+                        .y = 0,
+                        .w = w,
+                        .h = h
+                    };
+
+                    memset(&pgn_game, 0, sizeof(pgn_game));
+                    memset(&turn_history, 0, sizeof(turn_history));
+                    current_board_index = 0;
+                    if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
+                        printf("!!Error: could not parse provided PGN\n");
+                        destroy_context(&context);
+                        return -1;
+                    } else {
+                        printf("...Congrats, PGN parsed\n");
+                    }
+                    store_game_in_boards(&turn_history, pgn_game);
+                    trigger_board_refresh = true;
+                    
+                    end_paste_text:
                 }
 
-                char *start_text = &context.game_text[end_brace];
-                while (*start_text != '1'){start_text++; pgn_len--;}
-                SDL_Surface *s = TTF_RenderText_Shaded_Wrapped(
-                    context.font, start_text, pgn_len - end_brace, CLEAR_COLOR, 
-                    (SDL_Color) {20,20,20,255}, 
-                    alignment.input_box.w
-                );
-                if (!s) {
-                    printf("!!Error: could not create paste text surface\n");
-                    break;
+                if (mouse_info.scroll_d != 0) {
+                    printf("%f\n", mouse_info.scroll_d);
+                    if (alignment.text_area.y + 560 < alignment.text_area.h || 
+                        alignment.text_area.y > 0) {
+                            alignment.text_area.y += -mouse_info.scroll_d * 5;
+                            alignment.text_area.y = (float)CLAMP_I((int)alignment.text_area.y, 0, 560);
+                    }
                 }
-                if (context.text_texture) {
-                    SDL_DestroyTexture(context.text_texture);
-                    context.text_texture = NULL;
-                }
-                context.text_texture = SDL_CreateTextureFromSurface(context.renderer, s);
-                SDL_DestroySurface(s);
-                if (!context.text_texture) {
-                    printf("!!Error: could not create paste text texture\n");
-                    break;
-                }
-                
-                memset(&pgn_game, 0, sizeof(pgn_game));
-                memset(&turn_history, 0, sizeof(turn_history));
-                current_board_index = 0;
-                trigger_board_refresh = true;
-                if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
-                    printf("!!Error: could not parse provided PGN\n");
-                    destroy_context(&context);
-                    return -1;
-                } else {
-                    printf("...Congrats, PGN parsed\n");
-                }
-                store_game_in_boards(&turn_history, pgn_game);
             }
         }
 
@@ -239,15 +276,9 @@ main(int argc, char *argv[])
         clear_texture(context.renderer, context.input_texture, (SDL_Color) {30, 30, 30, 255});
 
 
-        float w = 0; float h = 0;
-        SDL_GetTextureSize(context.text_texture, &w, &h);
-        SDL_FRect input_source = (SDL_FRect) {
-            .x = 0,
-            .y = 0,
-            .w = w
-        };
-        //TODO:: clamp smaller heights to the texture height
-        input_source.h = (input_source.y + 560 >= h) ? h : input_source.y + 560;
+        SDL_FRect input_source = alignment.text_area;
+        input_source.h = ((input_source.y + 560 >= alignment.text_area.h) ? 
+            alignment.text_area.h : 560 - input_source.y);
 
         SDL_FRect input_dest = (SDL_FRect) {
             .x = alignment.input_box.x,
@@ -260,9 +291,8 @@ main(int argc, char *argv[])
         clear_texture(context.renderer, NULL, CLEAR_COLOR);
         SDL_RenderTexture(context.renderer, context.board_texture, NULL, &alignment.board_box);
         SDL_RenderTexture(context.renderer, context.input_texture, NULL, &alignment.input_box);
-        if (context.text_texture){
-            SDL_RenderTexture(context.renderer, context.text_texture, &input_source, 
-                &input_dest);
+        if (context.text_texture) {
+            SDL_RenderTexture(context.renderer, context.text_texture, &input_source, &input_dest);
         }
             
         SDL_RenderPresent(context.renderer);
@@ -273,9 +303,6 @@ main(int argc, char *argv[])
     destroy_context(&context);
     return 0;
 }
-
-
-
 
 bool pos_in_box(float x, float y, SDL_FRect r)
 {
