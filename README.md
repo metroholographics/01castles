@@ -25,7 +25,7 @@ v0.1
         - [!] Display game text on screen
             - [x] Paste text 
             - [x] Add scroll
-            - [~] Make game not crash on bad paste
+            - [x] Make game not crash on bad paste
             - [ ] Better text rendering structure
             - [ ] Tidy
 - [!] Strip variations from PGN_Reader

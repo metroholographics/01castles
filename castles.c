@@ -150,6 +150,7 @@ main(int argc, char *argv[])
                     mouse_info.x = e.wheel.mouse_x;
                     mouse_info.y = e.wheel.mouse_y;
                     mouse_info.scroll_d = e.wheel.y;
+                    break;
                 default:
                     break;
             }
@@ -182,12 +183,11 @@ main(int argc, char *argv[])
                     trigger_board_refresh = true;
 
                     if (context.game_text) {
-                        printf("...free'd existing game text\n");
                         free(context.game_text);
                         context.game_text = NULL;
+                        printf("...free'd existing game text\n");
                     }
 
-                    int text_start = 0;
                     char* start_text;
                     if (!valid_pgn) {
                         context.game_text = (char *) malloc(sizeof("Error: Invalid PGN"));
@@ -197,21 +197,19 @@ main(int argc, char *argv[])
                         context.game_text = (char *) malloc(pgn_len + 1);
                         sprintf(context.game_text, "%s", c);
                         context.game_text[pgn_len] = '\0';
+                        int text_start = 0;
                         for (size_t i = 0; i < pgn_len + 1; i++) {
                             if (context.game_text[i] == ']') text_start = i + 1;
                         }
                         start_text = &context.game_text[text_start];
                         while (*start_text != '1'){start_text++; pgn_len--;}
                     }
-                    
-                    SDL_Surface *s = NULL;
-                    
+
                     for (char *p = start_text; *p; p++) {
-                        if ((unsigned char)*p < 32)
-                            *p = ' ';
+                        if ((unsigned char)*p < 32) *p = ' ';
                     }
-                    // size_t len = strlen(start_text);
-                    s = TTF_RenderText_Shaded_Wrapped(
+
+                    SDL_Surface *s = TTF_RenderText_Shaded_Wrapped(
                         context.font, start_text, 0,
                         CLEAR_COLOR, (SDL_Color) {10,10,10,255}, 
                         (int)alignment.input_box.w
@@ -232,12 +230,9 @@ main(int argc, char *argv[])
                     }
                     float w = 0; float h = 0;
                     SDL_GetTextureSize(context.text_texture, &w, &h);
-
                     alignment.text_area = (SDL_FRect) {
-                        .x = 0,
-                        .y = 0,
-                        .w = w,
-                        .h = h
+                        .x = 0, .y = 0,
+                        .w = w, .h = h
                     };
 
                     end_paste_text:
@@ -246,9 +241,11 @@ main(int argc, char *argv[])
 
                 if (mouse_info.scroll_d != 0) {
                     if (alignment.text_area.y + 560 <= alignment.text_area.h) {
-                            alignment.text_area.y += -mouse_info.scroll_d * FONT_SIZE;
-                            alignment.text_area.y = (float)CLAMP_I((int)alignment.text_area.y, 0, 
-                            alignment.text_area.h - 560);
+                        alignment.text_area.y += -mouse_info.scroll_d * FONT_SIZE;
+                        alignment.text_area.y = (float)CLAMP_I(
+                            (int)alignment.text_area.y, 0, 
+                            (int)alignment.text_area.h - 560
+                        );
                     }
                 }
             }
@@ -283,8 +280,8 @@ main(int argc, char *argv[])
 
         SDL_FRect input_source = alignment.text_area;
         input_source.h = ((input_source.y + 560 >= alignment.text_area.h) ? 
-            alignment.text_area.h - input_source.y : 560);
-
+            alignment.text_area.h - input_source.y : 560
+        );
 
         SDL_FRect input_dest = (SDL_FRect) {
             .x = alignment.input_box.x,
