@@ -49,10 +49,23 @@ initialise_default_board(Piece *p)
     }
 }
 
-SDL_FRect*
-get_piece_sprite_source(Piece p, SDL_FRect *sprite_array)
+int
+create_new_game(const char *file_path, PGN_Game *g, TurnHistory *t)
 {
-    return &sprite_array[p];
+    int e1 = 0;
+    int e2 = 0;
+    memset(g, 0, sizeof(*g));
+    memset(t, 0, sizeof(*t));
+    if (file_path) {
+        if (pgn_create_game(g, file_path) < 0) {
+            printf("!!Error: could not parse provided PGN\n");
+            e1 = -1;
+        } else {
+            printf("...Congrats, PGN parsed\n");
+        }
+    }
+    e2 = store_game_in_boards(t, *g);
+    return (e1 == 0 && e2 == 0) ;
 }
 
 int
@@ -94,16 +107,10 @@ main(int argc, char *argv[])
 
     populate_piece_sprite_array(piece_sprite_array);
 
-    if (pgn_create_game(&pgn_game, PGN_PATH) < 0) {
-        printf("!!Error: could not parse provided PGN\n");
-        destroy_context(&context);
-        return -1;
-    } else {
-        printf("...Congrats, PGN parsed\n");
-    }
-
-    store_game_in_boards(&turn_history, pgn_game);
+    create_new_game(NULL, &pgn_game, &turn_history);
+    
     current_board = turn_history.game_turns[current_board_index];
+
     if (DEBUG) {
         printf("Grid:%d\n", ARRAY_SIZE(turn_history.game_turns[current_board_index]));
          for (int r = 7; r >= 0; r--) {
@@ -169,27 +176,15 @@ main(int argc, char *argv[])
                     size_t pgn_len = ftell(session_pgn);
                     fclose(session_pgn);
 
-                    memset(&pgn_game, 0, sizeof(pgn_game));
-                    memset(&turn_history, 0, sizeof(turn_history));
-                    bool valid_pgn = false;
-                    if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
-                        printf("!!Error: could not parse provided PGN\n");
-                    } else {
-                        printf("...Congrats, PGN parsed\n");
-                        valid_pgn = true;
-                    }
-                    current_board_index = 0;
-                    store_game_in_boards(&turn_history, pgn_game);
-                    trigger_board_refresh = true;
-
                     if (context.game_text) {
                         free(context.game_text);
                         context.game_text = NULL;
                         printf("...free'd existing game text\n");
                     }
-
+                    
+                    int valid_pgn = create_new_game("bin/session_pgn.txt", &pgn_game, &turn_history);
                     char* start_text;
-                    if (!valid_pgn) {
+                    if (valid_pgn == 0) {
                         context.game_text = (char *) malloc(sizeof("Error: Invalid PGN"));
                         sprintf(context.game_text, "Error: Invalid PGN");
                         start_text = &context.game_text[0];
@@ -204,6 +199,18 @@ main(int argc, char *argv[])
                         start_text = &context.game_text[text_start];
                         while (*start_text != '1'){start_text++; pgn_len--;}
                     }
+
+                    // memset(&pgn_game, 0, sizeof(pgn_game));
+                    // memset(&turn_history, 0, sizeof(turn_history));
+                    // if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
+                    //     printf("!!Error: could not parse provided PGN\n");
+                    // } else {
+                    //     printf("...Congrats, PGN parsed\n");
+                    //     valid_pgn = true;
+                    // }
+                    current_board_index = 0;
+                    // store_game_in_boards(&turn_history, pgn_game);
+                    trigger_board_refresh = true;
 
                     for (char *p = start_text; *p; p++) {
                         if ((unsigned char)*p < 32) *p = ' ';
@@ -1051,6 +1058,12 @@ initialise_context(Context *c, const char *title, int width, int height, const c
     }
 
     return true;
+}
+
+SDL_FRect*
+get_piece_sprite_source(Piece p, SDL_FRect *sprite_array)
+{
+    return &sprite_array[p];
 }
 
 void

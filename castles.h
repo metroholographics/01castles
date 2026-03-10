@@ -104,13 +104,13 @@ void destroy_context(Context *c);
 void clear_texture(SDL_Renderer *r, SDL_Texture *t, SDL_Color c);
 bool pos_in_box(float x, float y, SDL_FRect r);
 
-
-SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
-void       populate_piece_sprite_array(SDL_FRect *sprite_array);
+int        create_new_game(const char *file_path, PGN_Game *g, TurnHistory *t);
 void       initialise_default_board(Piece *p);
 void       copy_board(Piece *target, Piece *source);
 CSTL_Error store_game_in_boards(TurnHistory *th, PGN_Game p);
 CSTL_Error input_turn_on_board(Piece* b, PGN_Turn t, int color);
+SDL_FRect* get_piece_sprite_source(Piece p, SDL_FRect *sprite_array);
+void       populate_piece_sprite_array(SDL_FRect *sprite_array);
 
 bool    is_file(char c);
 bool    is_rank(char c);
