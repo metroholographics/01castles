@@ -199,17 +199,7 @@ main(int argc, char *argv[])
                         start_text = &context.game_text[text_start];
                         while (*start_text != '1'){start_text++; pgn_len--;}
                     }
-
-                    // memset(&pgn_game, 0, sizeof(pgn_game));
-                    // memset(&turn_history, 0, sizeof(turn_history));
-                    // if (pgn_create_game(&pgn_game, "bin/session_pgn.txt") < 0) {
-                    //     printf("!!Error: could not parse provided PGN\n");
-                    // } else {
-                    //     printf("...Congrats, PGN parsed\n");
-                    //     valid_pgn = true;
-                    // }
                     current_board_index = 0;
-                    // store_game_in_boards(&turn_history, pgn_game);
                     trigger_board_refresh = true;
 
                     for (char *p = start_text; *p; p++) {
@@ -221,6 +211,7 @@ main(int argc, char *argv[])
                         CLEAR_COLOR, (SDL_Color) {10,10,10,255}, 
                         (int)alignment.input_box.w
                     );
+
                     if (!s) {
                         printf("!!Error: could not create paste text surface\n");
                         goto end_paste_text;
@@ -235,6 +226,7 @@ main(int argc, char *argv[])
                         printf("!!Error: could not create paste text texture\n");
                         goto end_paste_text;
                     }
+
                     float w = 0; float h = 0;
                     SDL_GetTextureSize(context.text_texture, &w, &h);
                     alignment.text_area = (SDL_FRect) {
@@ -802,11 +794,15 @@ handle_pawn_move(Piece *b, char *piece, char *destination, int color)
         }
     } else {
         int file = char_to_file_or_rank(piece[1]);
+        int dest_rank = char_to_file_or_rank(destination[1]);
         for (int i = file * 8; i < file * 8 + 8; i++) {
             if (b[i] == active_pawn) {
-                if (trace_clear_line(b, i , destination_index, DIAGONAL)) {
-                    found_pawn = i;
-                    break;
+                //if piece is infront of pawn
+                if (i % 8 - dest_rank == sign) {
+                    if (trace_clear_line(b, i , destination_index, DIAGONAL)) {
+                        found_pawn = i;
+                        break;
+                    }
                 }
             }
         }
